@@ -15,18 +15,25 @@ export function getPlayList(url: string) {
   return http.get(url);
 }
 
-/*
-获取榜单详情
-
-参数
-id: 默认 4，从上面的列表中取值
-pageSize: 默认 100 // 部分接口不支持这个字段，所以这里默认选择100
-period: 榜单的时间，从上面的列表中取值，非必填
-time: 默认当前时间，如果有 period，此参数无效
+/**
+ * @description 获取榜单详情
+ * @param id 默认 4
 */
 export function topDetails(params: { id: number }) {
   return http.request({
     url: "/top",
+    method: "GET",
+    params,
+  });
+}
+
+/**
+ * @description 获取榜单详情
+ * @param id 默认 4
+*/
+export function getSongListDetails(params: { id: number }) {
+  return http.request({
+    url: "/songlist",
     method: "GET",
     params,
   });

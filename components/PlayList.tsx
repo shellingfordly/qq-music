@@ -1,22 +1,35 @@
 import { StyleSheet } from "react-native";
 import { Text, View } from "../components/Themed";
 import { Image } from "antd-mobile";
-import { themeColor } from "../utils/style";
 
 export interface PlayListProps {
   title: string;
   playList: any[];
 }
 
-export default function PlayList({ data }: { data: PlayListProps }) {
+export default function PlayList({
+  data,
+  itemTouchEnd,
+}: {
+  data: PlayListProps;
+  itemTouchEnd?: (item: any) => void;
+}) {
+  function onTouchEnd(item: any) {
+    itemTouchEnd && itemTouchEnd(item);
+  }
+
   return (
-    <View>
+    <>
       <View style={styles.titleContainer}>
         <Text style={styles.title}>{data.title}</Text>
       </View>
       <View style={styles.playContainer}>
-        {data.playList.map((item, index) => (
-          <View style={styles.playItem}>
+        {data.playList.map((item) => (
+          <View
+            style={styles.playItem}
+            key={item.tid || item.content_id}
+            onTouchEnd={() => onTouchEnd(item)}
+          >
             <View style={styles.playImg}>
               <Image
                 src={item.cover || item.cover_url_big}
@@ -25,14 +38,14 @@ export default function PlayList({ data }: { data: PlayListProps }) {
                 style={{ borderRadius: 10 }}
               />
               <Text style={styles.playNum}>
-                {(item.listen_num / 10000).toFixed(1)}万
+                {((item.listen_num || item.access_num) / 10000).toFixed(1)}万
               </Text>
             </View>
             <Text style={styles.playTitle}>{item.title}</Text>
           </View>
         ))}
       </View>
-    </View>
+    </>
   );
 }
 

@@ -1,20 +1,40 @@
+import { StyleSheet, ScrollView, StatusBar } from "react-native";
 import { View, Text } from "../../../../components/Themed";
-import { StyleSheet } from "react-native";
 import { useFetch } from "./useFetch";
-
+import { useNavigation } from "@react-navigation/native";
+import { useLocalStore } from "mobx-react";
+import { songStore } from "../../../../store/modules/songList";
 export default function RankPlayList() {
-  const { allRankList, topRanckMap, recommendRanckList } = useFetch();
-  console.log(topRanckMap);
+  const navigation = useNavigation();
+  const { topRanckMap } = useFetch();
+  const store = useLocalStore(() => songStore);
+
+  function onTouchEnd(song: any) {
+    store.setTheSongListInfo({
+      ...song,
+      isRank: true,
+      imgUrl: song.picUrl,
+      textOne: song.label,
+      textTwo: song.info.titleDetail,
+      textThree: `更新时间：${song.update}`,
+      textTotal: `排行榜 共${song.total}首`,
+    });
+    navigation.navigate("SongPage");
+  }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       {Object.values(topRanckMap).map((item) => (
-        <View style={styles.item}>
+        <View
+          style={styles.item}
+          key={item.id}
+          onTouchEnd={() => onTouchEnd(item)}
+        >
           <View style={styles.desc}>
             <Text style={styles.label}>{item.label}</Text>
             {item.list &&
               item.list.slice(0, 3).map((song: any, index: number) => (
-                <View style={styles.song}>
+                <View style={styles.song} key={song.id}>
                   <Text style={styles.index}>{index + 1}.</Text>
                   <Text style={styles.songTitle}>{song.title}-</Text>
                   <Text style={styles.singerName}>{song.singerName}</Text>
@@ -37,16 +57,16 @@ export default function RankPlayList() {
           </View>
         </View>
       ))}
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    height: "100%",
+    paddingTop: StatusBar.currentHeight,
     overflow: "scroll",
-    padding: 5,
+    padding: 20,
   },
   item: {
     flexDirection: "row",
@@ -54,9 +74,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: "hidden",
     marginBottom: 10,
-    shadowColor: "#999",
-    shadowOpacity: 5,
-    shadowRadius: 2,
   },
   desc: {
     padding: 10,
@@ -64,7 +81,6 @@ const styles = StyleSheet.create({
   itemBox: {
     position: "relative",
     width: 100,
-    height: 100,
     overflow: "hidden",
   },
   listenNum: {
