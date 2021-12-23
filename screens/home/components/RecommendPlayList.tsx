@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ApiUrl, getPlayList, getSongListDetails } from "../../../server/api";
 import PlayList from "../../../components/PlayList";
 import type { PlayListProps } from "../../../components/PlayList";
@@ -8,11 +8,14 @@ import { useLocalStore } from "mobx-react";
 import { songStore } from "../../../store/modules/songList";
 import { useNavigation } from "@react-navigation/native";
 import { View } from "react-native";
+import { SearchContext } from "../hooks/useContext";
 
 export default function RecommendPlayList({}) {
   const [playListData, setPlayListData] = useState<PlayListProps[]>([]);
   const store = useLocalStore(() => songStore);
   const navigation = useNavigation();
+
+  const { setIsShowSearch } = useContext(SearchContext);
 
   useEffect(() => {
     Promise.all([
@@ -32,8 +35,6 @@ export default function RecommendPlayList({}) {
     });
   }, []);
 
-  console.log(playListData);
-
   async function itemTouchEnd(item: any) {
     try {
       const { data: song } = await getSongListDetails({
@@ -44,8 +45,8 @@ export default function RecommendPlayList({}) {
         isRank: false,
         imgUrl: item.cover || item.cover_url_big,
         textOne: item.title,
-        textTwo: item.username,
-        textThree: `播放量：${item.listen_num}`,
+        textTwo: song.nickname,
+        textThree: `播放量：${item.listen_num || item.access_num}`,
         textTotal: `歌单 共${song.songnum}首`,
         list: song.songlist.map((v: any) => ({
           id: v.albumid,
@@ -57,6 +58,10 @@ export default function RecommendPlayList({}) {
     } catch (error) {}
   }
 
+  function goSearch() {
+    setIsShowSearch(true);
+  }
+
   return (
     <>
       <View
@@ -64,7 +69,7 @@ export default function RecommendPlayList({}) {
           padding: 20,
         }}
       >
-        <Button shape="rounded">
+        <Button shape="rounded" onClick={goSearch}>
           <Space>
             <SearchOutline />
             <span>搜索</span>

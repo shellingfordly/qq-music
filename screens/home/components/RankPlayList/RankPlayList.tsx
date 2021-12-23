@@ -1,9 +1,10 @@
 import { StyleSheet, ScrollView, StatusBar } from "react-native";
-import { View, Text } from "../../../../components/Themed";
-import { useFetch } from "./useFetch";
 import { useNavigation } from "@react-navigation/native";
+import { useFetch } from "./useFetch";
 import { useLocalStore } from "mobx-react";
+import { View, Text } from "../../../../components/Themed";
 import { songStore } from "../../../../store/modules/songList";
+
 export default function RankPlayList() {
   const navigation = useNavigation();
   const { topRanckMap } = useFetch();

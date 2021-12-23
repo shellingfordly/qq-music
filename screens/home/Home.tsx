@@ -1,9 +1,11 @@
 import { Tabs } from "antd-mobile";
 import RecommendPlayList from "./components/RecommendPlayList";
 import RankPlayList from "./components/RankPlayList/RankPlayList";
-import { ScrollView } from "react-native";
+import Search from "./components/Search";
+import { ScrollView, View } from "react-native";
 import { useState } from "react";
 import { observer } from "mobx-react";
+import { SearchContext } from "./hooks/useContext";
 
 enum Tab {
   Recommend = "RecommendPlayList",
@@ -12,6 +14,8 @@ enum Tab {
 
 function Home() {
   const [activeKey, setActiveKey] = useState<Tab>(Tab.Recommend);
+  const [isShowSearch, setIsShowSearch] = useState(true);
+  const value = { isShowSearch, setIsShowSearch };
 
   return (
     <>
@@ -34,7 +38,18 @@ function Home() {
           backgroundColor: "rgb(245, 245, 245)",
         }}
       >
-        {activeKey === Tab.Recommend ? <RecommendPlayList /> : <RankPlayList />}
+        <SearchContext.Provider value={value}>
+          <View style={!isShowSearch && { display: "none" }}>
+            <Search />
+          </View>
+          <View style={isShowSearch && { display: "none" }}>
+            {activeKey === Tab.Recommend ? (
+              <RecommendPlayList />
+            ) : (
+              <RankPlayList />
+            )}
+          </View>
+        </SearchContext.Provider>
       </ScrollView>
     </>
   );

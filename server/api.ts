@@ -9,6 +9,8 @@ export const ApiUrl = {
   DailyRecommend: "/recommend/daily",
   // 获取榜单列表
   TopCategory: "/top/category",
+  // 获取热搜词
+  HotSearch: "/search/hot",
 };
 
 export function getPlayList(url: string) {
@@ -17,8 +19,20 @@ export function getPlayList(url: string) {
 
 /**
  * @description 获取榜单详情
+ * @param key
+ */
+export function searchSong(params: { key: string }) {
+  return http.request({
+    url: "/search",
+    method: "GET",
+    params,
+  });
+}
+
+/**
+ * @description 获取榜单详情
  * @param id 默认 4
-*/
+ */
 export function topDetails(params: { id: number }) {
   return http.request({
     url: "/top",
@@ -30,7 +44,7 @@ export function topDetails(params: { id: number }) {
 /**
  * @description 获取榜单详情
  * @param id 默认 4
-*/
+ */
 export function getSongListDetails(params: { id: number }) {
   return http.request({
     url: "/songlist",
