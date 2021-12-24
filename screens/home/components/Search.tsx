@@ -1,4 +1,10 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import { SearchBar } from "antd-mobile";
 import { useContext, useEffect, useState } from "react";
 import { SearchContext } from "../hooks/useContext";
@@ -32,7 +38,7 @@ export default function Search() {
     setSearchHistore(getSearchHistory());
   }, []);
 
-  function onTouchEnd() {
+  function onCancel() {
     setTimeout(() => {
       // 显示热门搜索
       setIsShowHotSearch(true);
@@ -85,9 +91,9 @@ export default function Search() {
             width: "85%",
           }}
         />
-        <View onTouchEnd={onTouchEnd}>
+        <TouchableOpacity onPress={onCancel}>
           <Text style={styles.cancelText}>取消</Text>
-        </View>
+        </TouchableOpacity>
       </View>
       <ScrollView style={styles.hotSearch}>
         {!!searchHistory.length && isShowHotSearch && (
@@ -102,13 +108,13 @@ export default function Search() {
               }}
             >
               <Text style={[styles.title, { marginBottom: 0 }]}>搜索历史</Text>
-              <DeleteOutline onTouchEnd={onDeleteHistory} />
+              <DeleteOutline onClick={onDeleteHistory} />
             </View>
             <View style={styles.hostWords}>
               {searchHistory.map((word, i) => (
-                <View key={i} onTouchEnd={() => onSearch(word)}>
+                <TouchableOpacity key={i} onPress={() => onSearch(word)}>
                   <Text style={styles.word}>{word}</Text>
-                </View>
+                </TouchableOpacity>
               ))}
             </View>
           </>
@@ -118,9 +124,9 @@ export default function Search() {
             <Text style={styles.title}>热门搜索</Text>
             <View style={styles.hostWords}>
               {hotWords.map((item) => (
-                <View key={item.n} onTouchEnd={() => onSearch(item.k)}>
+                <TouchableOpacity key={item.n} onPress={() => onSearch(item.k)}>
                   <Text style={styles.word}>{item.k}</Text>
-                </View>
+                </TouchableOpacity>
               ))}
             </View>
           </>

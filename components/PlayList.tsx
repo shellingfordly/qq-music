@@ -1,6 +1,7 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import { Text, View } from "../components/Themed";
 import { Image } from "antd-mobile";
+import React from "react";
 
 export interface PlayListProps {
   title: string;
@@ -14,7 +15,7 @@ export default function PlayList({
   data: PlayListProps;
   itemTouchEnd?: (item: any) => void;
 }) {
-  function onTouchEnd(item: any) {
+  function onPress(item: any) {
     itemTouchEnd && itemTouchEnd(item);
   }
 
@@ -25,10 +26,10 @@ export default function PlayList({
       </View>
       <View style={styles.playContainer}>
         {data.playList.map((item) => (
-          <View
+          <TouchableOpacity
             style={styles.playItem}
             key={item.tid || item.content_id}
-            onTouchEnd={() => onTouchEnd(item)}
+            onPress={() => onPress(item)}
           >
             <View style={styles.playImg}>
               <Image
@@ -42,7 +43,7 @@ export default function PlayList({
               </Text>
             </View>
             <Text style={styles.playTitle}>{item.title}</Text>
-          </View>
+          </TouchableOpacity>
         ))}
       </View>
     </>

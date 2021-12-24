@@ -1,16 +1,22 @@
-import { StyleSheet, ScrollView, StatusBar } from "react-native";
+import {
+  StyleSheet,
+  ScrollView,
+  StatusBar,
+  TouchableOpacity,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useFetch } from "./useFetch";
 import { useLocalStore } from "mobx-react";
 import { View, Text } from "../../../../components/Themed";
 import { songStore } from "../../../../store/modules/songList";
+import React from "react";
 
 export default function RankPlayList() {
   const navigation = useNavigation();
   const { topRanckMap } = useFetch();
   const store = useLocalStore(() => songStore);
 
-  function onTouchEnd(song: any) {
+  function onPress(song: any) {
     store.setTheSongListInfo({
       ...song,
       isRank: true,
@@ -26,10 +32,10 @@ export default function RankPlayList() {
   return (
     <ScrollView style={styles.container}>
       {Object.values(topRanckMap).map((item) => (
-        <View
+        <TouchableOpacity
           style={styles.item}
           key={item.id}
-          onTouchEnd={() => onTouchEnd(item)}
+          onPress={() => onPress(item)}
         >
           <View style={styles.desc}>
             <Text style={styles.label}>{item.label}</Text>
@@ -56,7 +62,7 @@ export default function RankPlayList() {
               {(item.listenNum / 10000).toFixed(1)}万
             </Text>
           </View>
-        </View>
+        </TouchableOpacity>
       ))}
     </ScrollView>
   );
@@ -75,6 +81,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: "hidden",
     marginBottom: 10,
+    backgroundColor: "white",
   },
   desc: {
     padding: 10,
