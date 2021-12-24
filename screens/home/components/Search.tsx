@@ -106,10 +106,8 @@ export default function Search() {
             </View>
             <View style={styles.hostWords}>
               {searchHistory.map((word, i) => (
-                <View onTouchEnd={() => onSearch(word)}>
-                  <Text style={styles.word} key={i}>
-                    {word}
-                  </Text>
+                <View key={i} onTouchEnd={() => onSearch(word)}>
+                  <Text style={styles.word}>{word}</Text>
                 </View>
               ))}
             </View>
@@ -120,10 +118,8 @@ export default function Search() {
             <Text style={styles.title}>热门搜索</Text>
             <View style={styles.hostWords}>
               {hotWords.map((item) => (
-                <View onTouchEnd={() => onSearch(item.k)}>
-                  <Text style={styles.word} key={item.n}>
-                    {item.k}
-                  </Text>
+                <View key={item.n} onTouchEnd={() => onSearch(item.k)}>
+                  <Text style={styles.word}>{item.k}</Text>
                 </View>
               ))}
             </View>

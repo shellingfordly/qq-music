@@ -14,8 +14,9 @@ enum Tab {
 
 function Home() {
   const [activeKey, setActiveKey] = useState<Tab>(Tab.Recommend);
-  const [isShowSearch, setIsShowSearch] = useState(true);
+  const [isShowSearch, setIsShowSearch] = useState(false);
   const value = { isShowSearch, setIsShowSearch };
+  console.log(process.env);
 
   return (
     <>

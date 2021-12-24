@@ -3,6 +3,7 @@
     "name": "qqMusic",
     "slug": "qqMusic",
     "version": "1.0.0",
+    "githubUrl": "https://github.com/shellingfordly/qq-music",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -15,9 +16,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
