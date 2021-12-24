@@ -7,14 +7,16 @@ import { DeleteOutline } from "antd-mobile-icons";
 
 export default function Search() {
   const { setIsShowSearch } = useContext(SearchContext);
-  const [hotWords, setHotWords] = useState<{ k: number; n: string }[]>([]);
+  const [hotWords, setHotWords] = useState<{ k: string; n: number }[]>([]);
   const [songs, setSongs] = useState<any[]>([]);
   const [searchKey, setSearchKey] = useState("");
   const [isShowHotSearch, setIsShowHotSearch] = useState(true);
   const [searchHistory, setSearchHistore] = useState<string[]>([]);
 
-  function getSearchHistory() {
+  function getSearchHistory(): any[] {
     const data = localStorage.getItem("SearchHistory");
+    console.log(data);
+
     if (data) {
       return JSON.parse(data);
     }
@@ -45,12 +47,21 @@ export default function Search() {
     setIsShowHotSearch(true);
   }
 
+  function onDeleteHistory() {
+    localStorage.removeItem("SearchHistory");
+    setSearchHistore([]);
+  }
+
   async function onSearch(value: string) {
+    setSearchKey(value);
     setIsShowHotSearch(!value);
-    const data = getSearchHistory();
-    value && data.push(value);
-    localStorage.setItem("SearchHistory", JSON.stringify(data));
-    setSearchHistore(data);
+    if (value) {
+      const history = getSearchHistory();
+      history.unshift(value);
+      const data: any[] = [...new Set(history)];
+      localStorage.setItem("SearchHistory", JSON.stringify(data));
+      setSearchHistore(data);
+    }
     try {
       const res = await searchSong({
         key: value,
@@ -91,13 +102,15 @@ export default function Search() {
               }}
             >
               <Text style={[styles.title, { marginBottom: 0 }]}>搜索历史</Text>
-              <DeleteOutline />
+              <DeleteOutline onTouchEnd={onDeleteHistory} />
             </View>
             <View style={styles.hostWords}>
               {searchHistory.map((word, i) => (
-                <Text style={styles.word} key={i}>
-                  {word}
-                </Text>
+                <View onTouchEnd={() => onSearch(word)}>
+                  <Text style={styles.word} key={i}>
+                    {word}
+                  </Text>
+                </View>
               ))}
             </View>
           </>
@@ -107,9 +120,11 @@ export default function Search() {
             <Text style={styles.title}>热门搜索</Text>
             <View style={styles.hostWords}>
               {hotWords.map((item) => (
-                <Text style={styles.word} key={item.n}>
-                  {item.k}
-                </Text>
+                <View onTouchEnd={() => onSearch(item.k)}>
+                  <Text style={styles.word} key={item.n}>
+                    {item.k}
+                  </Text>
+                </View>
               ))}
             </View>
           </>
