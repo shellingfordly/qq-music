@@ -3,7 +3,7 @@ import RecommendPlayList from "./components/RecommendPlayList";
 import RankPlayList from "./components/RankPlayList/RankPlayList";
 import Search from "./components/Search";
 import { ScrollView, View } from "react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { observer } from "mobx-react";
 import { SearchContext } from "./hooks/useContext";
 
@@ -16,6 +16,12 @@ function Home() {
   const [activeKey, setActiveKey] = useState<Tab>(Tab.Recommend);
   const [isShowSearch, setIsShowSearch] = useState(false);
   const value = { isShowSearch, setIsShowSearch };
+
+  useEffect(() => {
+    if (activeKey === Tab.Rank) {
+      setIsShowSearch(false);
+    }
+  }, [activeKey]);
   return (
     <>
       <Tabs

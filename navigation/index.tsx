@@ -12,22 +12,21 @@ import {
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as React from "react";
-import { ColorSchemeName, Pressable } from "react-native";
+import { ColorSchemeName } from "react-native";
 
 import Colors from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
-import ModalScreen from "../screens/ModalScreen";
 import NotFoundScreen from "../screens/NotFoundScreen";
 import Home from "../screens/home/Home";
-import TabTwoScreen from "../screens/TabTwoScreen";
-import TabThreeScreen from "../screens/TabThreeScreen";
+import Account from "../screens/account/Account";
 import {
   RootStackParamList,
   RootTabParamList,
   RootTabScreenProps,
 } from "../types";
 import LinkingConfiguration from "./LinkingConfiguration";
-import SongPage from "../screens/song-page/SongPage";
+import SongList from "../screens/SongList/SongList";
+import Song from "../screens/Song/Song";
 
 export default function Navigation({
   colorScheme,
@@ -61,18 +60,18 @@ function RootNavigator() {
       <Stack.Screen
         name="NotFound"
         component={NotFoundScreen}
-        options={{ title: "Oops!" }}
+        options={{ title: "404" }}
       />
       <Stack.Screen
-        name="SongPage"
-        component={SongPage}
+        name="Song"
+        component={Song}
         options={{ headerShown: false }}
       />
-      <Stack.Group
-        screenOptions={{ presentation: "modal", headerShown: false }}
-      >
-        <Stack.Screen name="Modal" component={ModalScreen} />
-      </Stack.Group>
+      <Stack.Screen
+        name="SongList"
+        component={SongList}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 }
@@ -103,20 +102,11 @@ function BottomTabNavigator() {
         })}
       />
       <BottomTab.Screen
-        name="TabTwo"
-        component={TabTwoScreen}
+        name="Account"
+        component={Account}
         options={{
-          title: "Tab Two",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerShown: false,
-        }}
-      />
-      <BottomTab.Screen
-        name="TabThree"
-        component={TabThreeScreen}
-        options={{
-          title: "Tab Three",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: "Account",
+          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
           headerShown: false,
         }}
       />

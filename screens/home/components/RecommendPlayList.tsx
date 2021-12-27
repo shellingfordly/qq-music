@@ -9,6 +9,7 @@ import { songStore } from "../../../store/modules/songList";
 import { useNavigation } from "@react-navigation/native";
 import { View } from "react-native";
 import { SearchContext } from "../hooks/useContext";
+import { handleSingerName } from "../../../utils/song";
 
 export default function RecommendPlayList({}) {
   const [playListData, setPlayListData] = useState<PlayListProps[]>([]);
@@ -49,12 +50,13 @@ export default function RecommendPlayList({}) {
         textThree: `播放量：${item.listen_num || item.access_num}`,
         textTotal: `歌单 共${song.songnum}首`,
         list: song.songlist.map((v: any) => ({
+          ...v,
           id: v.albumid,
           title: v.songname,
-          singerName: v.singer.reduce((p: any, n: any) => p + n.name + " ", ""),
+          singerName: handleSingerName(v.singer),
         })),
       });
-      navigation.navigate("SongPage");
+      navigation.navigate("SongList");
     } catch (error) {}
   }
 

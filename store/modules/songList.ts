@@ -1,21 +1,25 @@
-import { makeAutoObservable } from "mobx"
-
+import { makeAutoObservable } from "mobx";
 
 class SongListStore {
-  theSongListInfo: any = {}
-  isSearchPage = false
+  theSongListInfo: any = {};
+  isSearchPage = false;
+  songInfo: any = {};
 
   constructor() {
-    makeAutoObservable(this)
+    makeAutoObservable(this);
   }
 
   setTheSongListInfo(data: any) {
-    this.theSongListInfo = data
+    this.theSongListInfo = data;
   }
 
   changeSearchPage(bool: boolean) {
-    this.isSearchPage = bool
+    this.isSearchPage = bool;
+  }
+
+  setSongInfo(data: any) {
+    this.songInfo = data;
   }
 }
 
-export const songStore = new SongListStore()
+export const songStore = new SongListStore();

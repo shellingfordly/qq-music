@@ -26,7 +26,7 @@ export default function RankPlayList() {
       textThree: `更新时间：${song.update}`,
       textTotal: `排行榜 共${song.total}首`,
     });
-    navigation.navigate("SongPage");
+    navigation.navigate("SongList");
   }
 
   return (
@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
   },
   desc: {
     padding: 10,
+    flex: 1,
   },
   itemBox: {
     position: "relative",

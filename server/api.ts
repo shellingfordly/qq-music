@@ -52,3 +52,63 @@ export function getSongListDetails(params: { id: number }) {
     params,
   });
 }
+
+/**
+ * @description 获取歌曲信息
+ * @param songmid
+ */
+export function getSongDetails(params: { songmid: number }) {
+  return http.request({
+    url: "/song",
+    method: "GET",
+    params,
+  });
+}
+
+/**
+ * @description 获取歌词
+ * @param songmid
+ */
+export function getSongLyric(params: { songmid: number }) {
+  return http.request({
+    url: "/lyric",
+    method: "GET",
+    params,
+  });
+}
+
+/**
+ * @description 获取播放链接
+ * @param id: songmid
+ */
+export function getSongPlayUrl(params: { id: number }) {
+  return http.request({
+    url: "/song/urls",
+    method: "GET",
+    params,
+  });
+}
+
+/**
+ * @description 设置cookie
+ * @param data: cookie 信息
+ */
+export function useSetCookie(data: { data: any }) {
+  return http.request({
+    url: "/user/setCookie",
+    method: "POST",
+    data,
+  });
+}
+
+/**
+ * @description 获取cookie
+ * @param id: qq/wxuin
+ */
+export function useGetCookie(params: { id: number }) {
+  return http.request({
+    url: "/user/getCookie",
+    method: "get",
+    params,
+  });
+}

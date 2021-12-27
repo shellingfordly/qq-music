@@ -1,11 +1,22 @@
 import { useLocalStore } from "mobx-react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Image, Button } from "antd-mobile";
 import { songStore } from "../../store/modules/songList";
 import { PlayOutline } from "antd-mobile-icons";
+import { useNavigation } from "@react-navigation/native";
 
-export default function SongPage({ route }: any) {
+export default function SongListPage({ route }: any) {
   const { theSongListInfo: data } = useLocalStore(() => songStore);
+  const navigation = useNavigation();
+  const store = useLocalStore(() => songStore);
+
+  function goSongPage(song: any) {
+    store.setSongInfo({
+      ...song,
+      mid: song.mid || song.songmid,
+    });
+    navigation.navigate("Song");
+  }
 
   return (
     <View style={styles.container}>
@@ -25,13 +36,17 @@ export default function SongPage({ route }: any) {
       <View style={styles.songList}>
         <Text style={styles.listTitle}>{data.textTotal}</Text>
         {data.list.map((item: any, i: number) => (
-          <View style={styles.songBox} key={item.id}>
+          <TouchableOpacity
+            style={styles.songBox}
+            key={item.id}
+            onPress={() => goSongPage(item)}
+          >
             {data.isRank && <Text style={styles.songIndex}>{i + 1}</Text>}
             <View>
               <Text style={styles.songTitle}>{item.title}</Text>
               <Text style={styles.singerName}>{item.singerName}</Text>
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
       </View>
     </View>
