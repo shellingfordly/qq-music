@@ -58,11 +58,6 @@ function RootNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="NotFound"
-        component={NotFoundScreen}
-        options={{ title: "404" }}
-      />
-      <Stack.Screen
         name="Song"
         component={Song}
         options={{ headerShown: false }}
@@ -71,6 +66,11 @@ function RootNavigator() {
         name="SongList"
         component={SongList}
         options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="NotFound"
+        component={NotFoundScreen}
+        options={{ title: "404" }}
       />
     </Stack.Navigator>
   );
@@ -95,7 +95,7 @@ function BottomTabNavigator() {
       <BottomTab.Screen
         name="Home"
         component={Home}
-        options={({ navigation }: RootTabScreenProps<"Home">) => ({
+        options={({}: RootTabScreenProps<"Home">) => ({
           title: "Home",
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
           headerShown: false,
@@ -104,11 +104,11 @@ function BottomTabNavigator() {
       <BottomTab.Screen
         name="Account"
         component={Account}
-        options={{
+        options={({}: RootTabScreenProps<"Account">) => ({
           title: "Account",
           tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
           headerShown: false,
-        }}
+        })}
       />
     </BottomTab.Navigator>
   );

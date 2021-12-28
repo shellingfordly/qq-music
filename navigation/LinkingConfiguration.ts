@@ -20,19 +20,15 @@ const linking: LinkingOptions<RootStackParamList> = {
               Home: "home",
             },
           },
-          TabTwo: {
+          Account: {
             screens: {
-              TabTwoScreen: "two",
-            },
-          },
-          TabThree: {
-            screens: {
-              TabThreeScreen: "three",
+              Account: "Account",
             },
           },
         },
       },
-      Modal: "modal",
+      Song: "Song",
+      SongList: "SongList",
       NotFound: "*",
     },
   },

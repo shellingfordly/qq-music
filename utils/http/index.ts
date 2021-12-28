@@ -4,7 +4,7 @@ import { Http } from "./axios";
 function createHttp(opt?: Partial<AxiosRequestConfig>) {
   const isDev = process.env.NODE_ENV === "development";
   return new Http({
-    baseURL: isDev ? "http://localhost:3300/" : "/",
+    baseURL: isDev ? "http://172.16.5.19:3300/" : "/",
     timeout: 3000,
     ...opt,
   });

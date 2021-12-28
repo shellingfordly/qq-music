@@ -10,8 +10,6 @@ import { useContext, useEffect, useState } from "react";
 import { SearchContext } from "../hooks/useContext";
 import { ApiUrl, getPlayList, searchSong } from "../../../server/api";
 import { DeleteOutline } from "antd-mobile-icons";
-import { useLocalStore } from "mobx-react";
-import { songStore } from "../../../store/modules/songList";
 import { useNavigation } from "@react-navigation/native";
 import { handleSingerName } from "../../../utils/song";
 
@@ -22,7 +20,6 @@ export default function Search() {
   const [searchKey, setSearchKey] = useState("");
   const [isShowHotSearch, setIsShowHotSearch] = useState(true);
   const [searchHistory, setSearchHistore] = useState<string[]>([]);
-  const store = useLocalStore(() => songStore);
   const navigation = useNavigation();
 
   function getSearchHistory(): any[] {
@@ -82,13 +79,12 @@ export default function Search() {
   }
 
   function goSongPage(song: any) {
-    store.setSongInfo({
-      ...song,
+    navigation.navigate("Song", {
+      cover: song.cover,
       title: song.songname,
       mid: song.songmid,
       singerName: handleSingerName(song.singer),
-    });
-    navigation.navigate("Song");
+    } as any);
   }
 
   return (

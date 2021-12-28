@@ -11,11 +11,12 @@ export default function SongListPage({ route }: any) {
   const store = useLocalStore(() => songStore);
 
   function goSongPage(song: any) {
-    store.setSongInfo({
-      ...song,
+    navigation.navigate("Song", {
+      title: song.title,
+      cover: song.cover,
+      singerName: song.singerName,
       mid: song.mid || song.songmid,
-    });
-    navigation.navigate("Song");
+    } as any);
   }
 
   return (
@@ -38,7 +39,7 @@ export default function SongListPage({ route }: any) {
         {data.list.map((item: any, i: number) => (
           <TouchableOpacity
             style={styles.songBox}
-            key={item.id}
+            key={item.songid}
             onPress={() => goSongPage(item)}
           >
             {data.isRank && <Text style={styles.songIndex}>{i + 1}</Text>}

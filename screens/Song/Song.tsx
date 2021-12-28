@@ -1,33 +1,73 @@
-import { useEffect, useState } from "react";
-import { ScrollView, Text, View, StyleSheet } from "react-native";
-import { getSongLyric, getSongPlayUrl } from "../../server/api";
-import { songStore } from "../../store/modules/songList";
-import { Image } from "antd-mobile";
-import { useLocalStore } from "mobx-react";
-import { PlayOutline, HeartOutline } from "antd-mobile-icons";
+import { useEffect, useRef, useState } from "react";
+import {
+  ScrollView,
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import { getSongPlayUrl } from "../../server/api";
+import { Image, ProgressBar } from "antd-mobile";
+import {
+  PlayOutline,
+  HeartOutline,
+  SoundOutline,
+  SoundMuteOutline,
+  UnorderedListOutline,
+} from "antd-mobile-icons";
+import { PauseIcon } from "../../components/icons/PauseIcon";
+import { themeColor } from "../../utils/style";
+import useLyric from "./hooks/useLyric";
 
-const songUrl =
-  "http://isure.stream.qqmusic.qq.com/C4000004Uiq84QArne.m4a?guid=2796982635&vkey=FE7ABBC79965C92F0C1402E19EBFE3395CC9A6B9EF4907A8568EF47A47C4C90AC0591D0FBCE4769529508662EC97EE4B21E48C86DCE78344&uin=1418504249&fromtag=66";
-
-function play() {}
-
-export default function Song() {
-  const { songInfo } = useLocalStore(() => songStore);
-  const [songUrl, setSongUrl] = useState("");
-  const [lyric, setLyric] = useState("");
+export default function Song({ route }: any) {
+  const songInfo = route.params;
+  const [songUrl, setSongUrl] = useState(
+    "http://isure.stream.qqmusic.qq.com/C4000004Uiq84QArne.m4a?guid=2796982635&vkey=CB371A2DE23DBF86AEB87A43D71897A2CFD1CF2AF5A0E04F7DF590D124DC491AC62BCAFDD9AE524A5AA68497F9A6A97729F82EE99D7A129E&uin=1418504249&fromtag=66"
+  );
+  const { lyrics } = useLyric(songInfo.mid);
+  const audioEle = useRef<any>(null);
+  const [isPlay, setIsPlay] = useState(false);
+  const [hasSound, setHasSound] = useState(true);
+  const [soundPercent, setSoundPercent] = useState(10);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [playPercent, setPlayPercent] = useState(0);
 
   useEffect(() => {
-    console.log(songInfo);
-
-    if (songInfo.mid) {
-      getSongLyric({ songmid: songInfo.mid }).then((res) => {
-        setLyric(res.data.lyric);
-      });
-      getSongPlayUrl({ id: songInfo.mid }).then((res) => {
-        setSongUrl(res.data);
-      });
-    }
+    audioEle.current.volume = soundPercent / 100;
+    audioEle.current.ontimeupdate = function () {
+      const newCurrentTime = audioEle.current.currentTime;
+      setCurrentTime(newCurrentTime);
+      setPlayPercent((newCurrentTime / audioEle.current.duration) * 100);
+    };
+    getSongPlayUrl({ id: songInfo.mid }).then((res) => {
+      setSongUrl(res.data);
+    });
+    return () => {};
   }, []);
+
+  const lyricColorStyle = (lyric: [number, number, string | null]) => {
+    const hasColor = lyric[0] < currentTime && currentTime < lyric[1];
+    return {
+      color: hasColor ? themeColor.primary : "",
+    };
+  };
+
+  async function onPlay() {
+    if (audioEle.current && !isPlay) {
+      audioEle.current.play();
+      setIsPlay(true);
+    } else {
+      audioEle.current.pause();
+      setIsPlay(false);
+    }
+  }
+
+  function onHandleSound() {
+    setHasSound(!hasSound);
+    audioEle.current.muted = hasSound;
+    setSoundPercent(0);
+    audioEle.current.volume = 0;
+  }
 
   return (
     <View style={styles.container}>
@@ -41,23 +81,57 @@ export default function Song() {
         )}
       </View>
       <ScrollView style={styles.lyricBox}>
-        <Text>{lyric}</Text>
+        {lyrics.map((lyric) => (
+          <Text style={lyricColorStyle(lyric)} key={lyric[1]}>
+            {lyric[2]}
+          </Text>
+        ))}
       </ScrollView>
-      <View style={styles.btnBox}>
-        <View style={styles.btn} onTouchEnd={play}>
-          <PlayOutline fontSize={20} />
+      <ProgressBar
+        percent={playPercent}
+        style={{
+          "--fill-color": themeColor.primary,
+        }}
+      />
+      <View style={styles.toolsBox}>
+        <View style={styles.btnBox}>
+          <TouchableOpacity style={styles.btn} onPress={onPlay}>
+            {isPlay && <PauseIcon />}
+            {!isPlay && <PlayOutline fontSize={20} />}
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.btn, { marginLeft: 20 }]}>
+            <HeartOutline fontSize={20} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.sound} onPress={onHandleSound}>
+            {hasSound && <SoundOutline fontSize={23} />}
+            {!hasSound && <SoundMuteOutline fontSize={23} />}
+          </TouchableOpacity>
+          <View style={styles.progressBarBox}>
+            <ProgressBar
+              percent={soundPercent}
+              style={{
+                "--fill-color": hasSound ? themeColor.primary : "#ccc",
+              }}
+            />
+          </View>
         </View>
-        <View style={styles.btn}>
-          <HeartOutline fontSize={20} />
-        </View>
+        <TouchableOpacity style={styles.playList}>
+          <UnorderedListOutline fontSize={20} />
+        </TouchableOpacity>
       </View>
+      <audio
+        style={{ display: "none" }}
+        ref={audioEle}
+        src={songUrl}
+        controls
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    height: "100vh",
+    flex: 1,
     backgroundColor: "rgb(250, 250, 250)",
   },
   songInfo: {
@@ -89,23 +163,36 @@ const styles = StyleSheet.create({
     textAlign: "center",
     backgroundColor: "white",
   },
-  btnBox: {
-    width: "28%",
-    height: 70,
-    margin: "auto",
-    display: "flex",
+  toolsBox: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingTop: 10,
-    paddingBottom: 10,
+    height: 70,
+  },
+  btnBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 20,
   },
   btn: {
+    justifyContent: "center",
+    alignItems: "center",
     width: 30,
     height: 30,
     border: "1px solid rgba(0,0,0,.2)",
     borderRadius: 100,
-    justifyContent: "center",
-    alignItems: "center",
+  },
+  sound: {
+    marginLeft: 20,
+  },
+  progressBarBox: {
+    width: 80,
+    marginLeft: 8,
+  },
+  playList: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    paddingRight: 20,
   },
 });
