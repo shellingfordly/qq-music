@@ -1,21 +1,145 @@
-import { Button } from "antd-mobile";
-import { View } from "react-native";
-import { useGetCookie, useSetCookie } from "../../server/api";
+import { Image } from "antd-mobile";
+import { useEffect, useState } from "react";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import { getSongListDetails, getUserCreateSongList } from "../../server/api";
+import { UserOutline, RightOutline } from "antd-mobile-icons";
+import { useLocalStore } from "mobx-react-lite";
+import { songStore } from "../../store/modules/songList";
+import { useNavigation } from "@react-navigation/core";
+import { handleSingerName } from "../../utils/song";
+
 
 export default function Account() {
-  function setCookie() {
-    // useSetCookie({
-    //   data: "RK=+sD9Qf76ME; ptcz=40230196ccaf81bfc8f7b525ab01a6376a8d6244c114627e8bf4cb58ac8e15bc; Qs_lvt_323937=1636606009; Qs_pv_323937=4107239090385080300; pgv_pvid=4715867676; fqm_pvqid=c6215e23-4353-4d61-84ac-4a8bb6ae60aa; ts_uid=408586008; ptui_loginuin=1418504249; fqm_sessionid=53109454-e365-4b72-917f-237525c30bad; pgv_info=ssid=s155757283; ct=2011; _qpsvr_localtk=0.8680287597635976; euin=oKv5Ne4z7e-PNv**; tmeLoginType=2; ts_refer=ADTAGmyqq; ts_last=y.qq.com/; login_type=1; psrf_qqrefresh_token=44070A910F02F9BAA5A082F77805FFD5; qm_keyst=Q_H_L_2aqsA760ea5J8njoxZswuI01nOyeD2wSuu-nSma-lPH5ctU8lgDiBqfivtuFvA7; psrf_access_token_expiresAt=1648460361; psrf_qqunionid=F8C64AE89BAC1D140F5705102E4FB4DE; psrf_qqopenid=E03784002AA13EF103AB689D83BCBF7B; wxrefresh_token=; uin=1418504249; wxopenid=; qm_keyst=Q_H_L_2aqsA760ea5J8njoxZswuI01nOyeD2wSuu-nSma-lPH5ctU8lgDiBqfivtuFvA7; psrf_musickey_createtime=1640684361; qqmusic_key=Q_H_L_2aqsA760ea5J8njoxZswuI01nOyeD2wSuu-nSma-lPH5ctU8lgDiBqfivtuFvA7; psrf_qqaccess_token=BECB0F9B36D7AD1910E2D68980847778; wxunionid=",
-    // });
+  const [userInfo, setUserInfo] = useState<any>({})
+  const [userCreateSongList, setUserCreateSongList] = useState<any[]>([])
+  const store = useLocalStore(() => songStore);
+  const navigation = useNavigation();
 
-    useGetCookie({
-      id: 1418504249,
-    });
+  useEffect(() => {
+    getUserCreateSongList({
+      id: '1418504249'
+    }).then(res => {
+      const list = res.data.list
+      list.shift()
+      setUserInfo(res.data.creator)
+      setUserCreateSongList(list)
+    })
+  }, [])
+
+  async function onGoSongList(id: number) {
+    const { data } = await getSongListDetails({ id })
+    store.setTheSongListInfo({
+      ...data,
+      imgUrl: data.logo,
+      isRank: false,
+      textOne: data.dissname,
+      textTwo: data.nickname,
+      textThree: `播放量：${data.visitnum}`,
+      textTotal: `歌单 共${data.cur_song_num}首`,
+      list: data.songlist.map((v: any) => ({
+        ...v,
+        id: v.albumid,
+        title: v.songname,
+        singerName: handleSingerName(v.singer),
+      })),
+    })
+    navigation.navigate("SongList");
   }
 
   return (
-    <>
-      <Button onClick={setCookie}>set cookie</Button>
-    </>
+    <View style={styles.container}>
+      <View style={styles.topBox}>
+        <View style={styles.topContent}>
+          <View style={styles.userHead}>
+            <UserOutline fontSize={50} />
+          </View>
+          <Text style={styles.userName}>{userInfo.hostname}</Text>
+        </View>
+      </View>
+      <ScrollView style={styles.songListBox}>
+        <Text style={styles.songListTitle}>歌单{userCreateSongList.length}</Text>
+        {userCreateSongList.map(song => (
+          <TouchableOpacity style={styles.songListItem} key={song.tid} onPress={() => onGoSongList(song.tid)}>
+            <Image style={{ borderRadius: 10 }} width={60} height={60} src={song.diss_cover} />
+            <View style={styles.infoBox}>
+              <Text style={styles.songName}>{song.diss_name}</Text>
+              <Text style={styles.songCount}>
+                <Text style={{ marginRight: 5 }}>{song.song_cnt}首</Text>
+                <Text>{song.listen_num}次播放</Text>
+              </Text>
+            </View>
+            <View style={styles.iconBox}>
+              <RightOutline fontSize={18} style={{ color: '#666' }} />
+            </View>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
   );
 }
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1
+  },
+  topBox: {
+    position: 'relative',
+    height: '30%',
+    padding: 20,
+    backgroundColor: '#aaa'
+  },
+  topContent: {
+    position: 'absolute',
+    bottom: 20
+  },
+  userHead: {
+    backgroundColor: '#ddd',
+    borderRadius: 100,
+    width: 80,
+    height: 80,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  userName: {
+    marginTop: 20,
+    fontSize: 24,
+    fontWeight: '600',
+    color: 'white'
+  },
+  songListBox: {
+    height: '70%',
+    padding: 20,
+  },
+  songListTitle: {
+    paddingBottom: 20,
+    fontSize: 18,
+    fontWeight: '600'
+  },
+  songListItem: {
+    position: 'relative',
+    flexDirection: 'row',
+    marginBottom: 10,
+  },
+  infoBox: {
+    flexDirection: 'column',
+    marginLeft: 15,
+    justifyContent: 'center',
+  },
+  songName: {
+    fontSize: 14,
+    marginBottom: 5
+  },
+  songCount: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    fontSize: 12,
+    color: '#666'
+  },
+  iconBox: {
+    position: 'absolute',
+    right: 0,
+    top: '50%',
+    marginTop: -10
+  }
+})

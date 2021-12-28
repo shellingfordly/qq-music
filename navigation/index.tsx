@@ -18,7 +18,7 @@ import Colors from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
 import NotFoundScreen from "../screens/NotFoundScreen";
 import Home from "../screens/home/Home";
-import Account from "../screens/account/Account";
+import Account from "../screens/Account/Account";
 import {
   RootStackParamList,
   RootTabParamList,
@@ -87,7 +87,7 @@ function BottomTabNavigator() {
 
   return (
     <BottomTab.Navigator
-      initialRouteName="Home"
+      initialRouteName="Account"
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].tint,
       }}

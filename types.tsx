@@ -18,7 +18,6 @@ declare global {
 
 export type RootStackParamList = {
   Root: NavigatorScreenParams<RootTabParamList> | undefined;
-  Modal: undefined;
   Song: undefined;
   SongList: undefined;
   NotFound: undefined;

@@ -112,3 +112,42 @@ export function useGetCookie(params: { id: number }) {
     params,
   });
 }
+
+/**
+ * @description 获取用户信息
+ * @param id: qq/wxuin
+ */
+ export function getUserDetail(params: { id: string }) {
+  return http.request({
+    url: "/user/detail",
+    method: "get",
+    params,
+  });
+}
+
+
+/**
+ * @description 获取用户收藏的歌单
+ * @param id: qq/wxuin
+ */
+ export function getUserCollectSongList(params: { id: string }) {
+  return http.request({
+    url: "/user/collect/songlist",
+    method: "get",
+    params,
+  });
+}
+
+
+
+/**
+ * @description 获取用户创建的歌单
+ * @param id: qq/wxuin
+ */
+ export function getUserCreateSongList(params: { id: string }) {
+  return http.request({
+    url: "/user/songlist",
+    method: "get",
+    params,
+  });
+}
