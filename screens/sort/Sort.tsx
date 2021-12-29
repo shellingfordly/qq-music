@@ -1,7 +1,7 @@
 import { Tabs } from "antd-mobile";
 import { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
-import { getSongList } from "../../server/api";
+import API from "../../server/api";
 import { navlist } from "./constants";
 import { Image } from "antd-mobile";
 import { useNavigation } from "@react-navigation/native";
@@ -12,7 +12,7 @@ export default function Sort() {
   const navigation = useNavigation();
 
   const getSongListApi = async (id = songListId) => {
-    const res = await getSongList({ category: id });
+    const res = await API.GetSongList({ category: id });
     const list = res.data.list;
     list.length -= list.length % 3;
     setSongLists(list);

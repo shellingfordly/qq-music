@@ -8,7 +8,7 @@ import {
 import { SearchBar } from "antd-mobile";
 import { useContext, useEffect, useState } from "react";
 import { SearchContext } from "../hooks/useContext";
-import { ApiUrl, getPlayList, searchSong } from "../../../server/api";
+import API from "../../../server/api";
 import { DeleteOutline } from "antd-mobile-icons";
 import { useNavigation } from "@react-navigation/native";
 import { handleSingerName } from "../../../utils/song";
@@ -33,7 +33,7 @@ export default function Search() {
 
   useEffect(() => {
     try {
-      getPlayList(ApiUrl.HotSearch).then((res) => {
+      API.HotSearch().then((res) => {
         setHotWords(res.data);
       });
     } catch (error) {}
@@ -71,7 +71,7 @@ export default function Search() {
       setSearchHistore(data);
     }
     try {
-      const res = await searchSong({
+      const res = await API.SearchSong({
         key: value,
       });
       setSongs(res.data.list);

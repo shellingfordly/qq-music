@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { getSongLyric } from "../../../server/api";
+import API from "../../../server/api";
 
 export default function useLyric(songmid: number) {
   const [lyrics, setLyrics] = useState<[number, number, string | null][]>([]);
 
   useEffect(() => {
     if (songmid) {
-      getSongLyric({ songmid }).then((res) => {
+      API.GetSongLyric({ songmid }).then((res) => {
         setLyrics(handleLyric(res.data.lyric));
         console.log(handleLyric(res.data.lyric));
       });

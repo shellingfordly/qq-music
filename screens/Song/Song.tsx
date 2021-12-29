@@ -6,7 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
-import { getSongPlayUrl } from "../../server/api";
+import API from "../../server/api";
 import { Image, ProgressBar, Toast } from "antd-mobile";
 import {
   PlayOutline,
@@ -39,7 +39,7 @@ export default function Song({ route }: any) {
       setCurrentTime(newCurrentTime);
       setPlayPercent((newCurrentTime / audioEle.current.duration) * 100);
     };
-    getSongPlayUrl({ id: songInfo.mid }).then((res) => {
+    API.GetSongPlayUrl({ id: songInfo.mid }).then((res) => {
       setSongUrl(res.data);
     });
     return () => {};

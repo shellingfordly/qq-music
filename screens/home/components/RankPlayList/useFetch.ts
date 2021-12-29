@@ -1,4 +1,4 @@
-import { ApiUrl, getPlayList, topDetails } from "../../../../server/api";
+import API from "../../../../server/api";
 import { useEffect, useState } from "react";
 
 export function useFetch() {
@@ -12,7 +12,7 @@ export function useFetch() {
       const id = data[index].topId;
       if (id === 201) continue;
       map[id] = data[index];
-      topDetails({ id, pageSize: 3 }).then((res) => {
+      API.TopRankDetails({ id, pageSize: 3 }).then((res) => {
         setTopRanckMap((oldData) => ({
           ...oldData,
           [id]: {
@@ -31,7 +31,7 @@ export function useFetch() {
       if (local) {
         res = JSON.parse(local);
       } else {
-        const res = await getPlayList(ApiUrl.TopCategory);
+        const res = await API.TopRankCategory();
         localStorage.setItem("RankList", JSON.stringify(res));
       }
 

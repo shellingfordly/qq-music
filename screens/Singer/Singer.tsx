@@ -1,6 +1,6 @@
 import { CSSProperties, useEffect, useState } from "react";
 import { ScrollView, View, Text } from "react-native";
-import { getSingerCateGory, getSingerList } from "../../server/api";
+import API from "../../server/api";
 import { themeColor } from "../../utils/style";
 import { Tag, List, InfiniteScroll, Image } from "antd-mobile";
 import { sleep } from "antd-mobile/es/utils/sleep";
@@ -19,7 +19,7 @@ let pageNo = 1;
 
 async function mockRequest() {
   await sleep(500);
-  const res = await getSingerList({ pageNo });
+  const res = await API.GetSingerList({ pageNo });
   pageNo++;
   return res.data.list;
 }
@@ -43,7 +43,7 @@ export default function Singer() {
     selectedMap[key] === id ? themeColor.primary : "#fafafa";
 
   useEffect(() => {
-    getSingerCateGory().then((res) => {
+    API.SingerCateGory().then((res) => {
       setSingerCateGory({
         area: res.data.area,
         genre: res.data.genre,
@@ -63,7 +63,7 @@ export default function Singer() {
       ...data,
       [key]: id,
     }));
-    const res = await getSingerList({ ...selectedMap, [key]: id });
+    const res = await API.GetSingerList({ ...selectedMap, [key]: id });
     setSingerList(res.data.list);
   }
 

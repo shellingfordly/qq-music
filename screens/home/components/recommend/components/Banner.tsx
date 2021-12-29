@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Image } from "antd-mobile";
 import Swiper from "react-native-swiper";
-import { ApiUrl, getPlayList } from "../../../../../server/api";
+import API from "../../../../../server/api";
 import { themeColor } from "../../../../../utils/style";
 
 export default function Banner() {
   const [bannerList, setBannerList] = useState<any>([]);
 
   useEffect(() => {
-    getPlayList(ApiUrl.RecommendBanner).then((res) => {
+    API.RecommendBanner().then((res) => {
       setBannerList(res.data);
     });
   }, []);

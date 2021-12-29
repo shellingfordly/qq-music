@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { PlayListProps } from "../components/PlayList";
-import { ApiUrl, getPlayList, userLookCookie } from "../../../../../server/api";
+import API from "../../../../../server/api";
 
 const sortBg = [
   "https://y.gtimg.cn/music/common/upload/category_area/4106837.jpeg?max_age=2592000",
@@ -16,9 +16,9 @@ export default function useFetch() {
 
   // 获取用户日推，需要cookie
   useEffect(() => {
-    userLookCookie().then((res) => {
+    API.UserLookCookie().then((res) => {
       if (res.data.uin) {
-        getPlayList(ApiUrl.DailyRecommend).then((res) => {
+        API.DailyRecommend().then((res) => {
           setPlayListData((data) => {
             return [
               {
@@ -35,26 +35,25 @@ export default function useFetch() {
 
   // 获取 官方歌单 达人歌单
   useEffect(() => {
-    Promise.all([
-      getPlayList(ApiUrl.CategoryRecommend),
-      getPlayList(ApiUrl.ForYouRecommend),
-    ]).then((res) => {
-      setPlayListData([
-        {
-          title: "官方歌单",
-          playList: res[0].data.list,
-        },
-        {
-          title: "达人歌单",
-          playList: res[1].data.list,
-        },
-      ]);
-    });
+    Promise.all([API.CategoryRecommend(), API.ForYouRecommend()]).then(
+      (res) => {
+        setPlayListData([
+          {
+            title: "官方歌单",
+            playList: res[0].data.list,
+          },
+          {
+            title: "达人歌单",
+            playList: res[1].data.list,
+          },
+        ]);
+      }
+    );
   }, []);
 
   // 分类专区
   useEffect(() => {
-    getPlayList(ApiUrl.SongListCategory).then((res) => {});
+    API.SongListCategory().then((res) => {});
   }, []);
 
   return { playListData };

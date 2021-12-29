@@ -3,7 +3,7 @@ import { Image, Button } from "antd-mobile";
 import { PlayOutline } from "antd-mobile-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
-import { getSongListDetails, topDetails } from "../../server/api";
+import API from "../../server/api";
 import { handleSingerName } from "../../utils/song";
 
 enum SongListType {
@@ -28,14 +28,14 @@ export default function SongListPage({ route }: any) {
 
   useEffect(() => {
     if (songListInfo.type === SongListType.Rank) {
-      topDetails({ id: songListInfo.id }).then((res) => {
+      API.TopRankDetails({ id: songListInfo.id }).then((res) => {
         setData({
           ...res.data,
           songlist: res.data.list,
         });
       });
     } else {
-      getSongListDetails({
+      API.GetSongListDetails({
         id: songListInfo.id,
       }).then((res) => {
         setData(res.data);
