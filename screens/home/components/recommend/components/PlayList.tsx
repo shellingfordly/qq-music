@@ -1,5 +1,10 @@
-import { StyleSheet, TouchableOpacity } from "react-native";
-import { Text, View } from "../components/Themed";
+import {
+  Text,
+  View,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { Image } from "antd-mobile";
 import React from "react";
 
@@ -24,7 +29,12 @@ export default function PlayList({
       <View style={styles.titleContainer}>
         <Text style={styles.title}>{data.title}</Text>
       </View>
-      <View style={styles.playContainer}>
+      <ScrollView
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        pagingEnabled={true}
+        style={styles.playContainer}
+      >
         {data.playList.map((item) => (
           <TouchableOpacity
             style={styles.playItem}
@@ -45,7 +55,7 @@ export default function PlayList({
             <Text style={styles.playTitle}>{item.title}</Text>
           </TouchableOpacity>
         ))}
-      </View>
+      </ScrollView>
     </>
   );
 }
@@ -61,9 +71,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   playContainer: {
-    flexDirection: "row",
-    overflow: "scroll",
-    paddingBottom: 3,
+    height: 150,
   },
   playItem: {
     width: 100,

@@ -20,6 +20,10 @@ export type RootStackParamList = {
   Root: NavigatorScreenParams<RootTabParamList> | undefined;
   Song: undefined;
   SongList: undefined;
+  Singer: undefined;
+  Rank: undefined;
+  Radio: undefined;
+  Sort: undefined;
   NotFound: undefined;
 };
 

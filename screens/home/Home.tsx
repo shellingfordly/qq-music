@@ -1,5 +1,5 @@
 import { Tabs } from "antd-mobile";
-import RecommendPlayList from "./components/RecommendPlayList";
+import RecommendPlayList from "./components/recommend/RecommendPlayList";
 import RankPlayList from "./components/RankPlayList/RankPlayList";
 import Search from "./components/Search";
 import { ScrollView, View } from "react-native";

@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { getSongPlayUrl } from "../../server/api";
-import { Image, ProgressBar } from "antd-mobile";
+import { Image, ProgressBar, Toast } from "antd-mobile";
 import {
   PlayOutline,
   HeartOutline,
@@ -53,6 +53,13 @@ export default function Song({ route }: any) {
   };
 
   async function onPlay() {
+    if (!songUrl) {
+      Toast.show({
+        icon: "fail",
+        content: "播放链接获取失败，请尝试刷新重试。",
+      });
+      return;
+    }
     if (audioEle.current && !isPlay) {
       audioEle.current.play();
       setIsPlay(true);

@@ -19,6 +19,7 @@ import useColorScheme from "../hooks/useColorScheme";
 import NotFoundScreen from "../screens/NotFoundScreen";
 import Home from "../screens/home/Home";
 import Account from "../screens/Account/Account";
+import Singer from "../screens/Singer/Singer";
 import {
   RootStackParamList,
   RootTabParamList,
@@ -68,6 +69,11 @@ function RootNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
+        name="Singer"
+        component={Singer}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
         name="NotFound"
         component={NotFoundScreen}
         options={{ title: "404" }}
@@ -87,7 +93,7 @@ function BottomTabNavigator() {
 
   return (
     <BottomTab.Navigator
-      initialRouteName="Account"
+      initialRouteName="Home"
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].tint,
       }}
