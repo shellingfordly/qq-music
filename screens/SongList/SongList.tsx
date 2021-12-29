@@ -1,20 +1,53 @@
-import { useLocalStore } from "mobx-react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Image, Button } from "antd-mobile";
-import { songStore } from "../../store/modules/songList";
 import { PlayOutline } from "antd-mobile-icons";
 import { useNavigation } from "@react-navigation/native";
+import { useEffect, useState } from "react";
+import { getSongListDetails, topDetails } from "../../server/api";
+import { handleSingerName } from "../../utils/song";
+
+enum SongListType {
+  Rank = "Rank",
+  Sort = "Sort",
+  Recommend = "Recommend",
+}
+
+interface SongListInfo {
+  id: number;
+  title: string;
+  imgUrl: string;
+  subTitle: string;
+  message: string;
+  type?: SongListType;
+}
 
 export default function SongListPage({ route }: any) {
-  const { theSongListInfo: data } = useLocalStore(() => songStore);
   const navigation = useNavigation();
-  const store = useLocalStore(() => songStore);
+  const songListInfo: SongListInfo = route.params;
+  const [data, setData] = useState<any>({});
+
+  useEffect(() => {
+    if (songListInfo.type === SongListType.Rank) {
+      topDetails({ id: songListInfo.id }).then((res) => {
+        setData({
+          ...res.data,
+          songlist: res.data.list,
+        });
+      });
+    } else {
+      getSongListDetails({
+        id: songListInfo.id,
+      }).then((res) => {
+        setData(res.data);
+      });
+    }
+  }, []);
 
   function goSongPage(song: any) {
     navigation.navigate("Song", {
-      title: song.title,
+      title: song.songname,
       cover: song.cover,
-      singerName: song.singerName,
+      singerName: handleSingerName(song.singer),
       mid: song.mid || song.songmid,
     } as any);
   }
@@ -23,11 +56,11 @@ export default function SongListPage({ route }: any) {
     <View style={styles.container}>
       <View style={styles.infoBox}>
         <View style={styles.imgBox}>
-          <Image src={data.imgUrl} width={165} height={165} />
+          <Image src={songListInfo.imgUrl} width={165} height={165} />
         </View>
-        <Text style={styles.label}>{data.textOne}</Text>
-        <Text style={styles.titleDetail}>{data.textTwo}</Text>
-        <Text style={[styles.update]}>{data.textThree}</Text>
+        <Text style={styles.label}>{songListInfo.title}</Text>
+        <Text style={styles.titleDetail}>{songListInfo.subTitle}</Text>
+        <Text style={[styles.update]}>{songListInfo.message}</Text>
         <View style={styles.playBtn}>
           <Button color="primary">
             <PlayOutline />
@@ -35,20 +68,29 @@ export default function SongListPage({ route }: any) {
         </View>
       </View>
       <View style={styles.songList}>
-        <Text style={styles.listTitle}>{data.textTotal}</Text>
-        {data.list.map((item: any, i: number) => (
-          <TouchableOpacity
-            style={styles.songBox}
-            key={item.songid}
-            onPress={() => goSongPage(item)}
-          >
-            {data.isRank && <Text style={styles.songIndex}>{i + 1}</Text>}
-            <View>
-              <Text style={styles.songTitle}>{item.title}</Text>
-              <Text style={styles.singerName}>{item.singerName}</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
+        <Text style={styles.listTitle}>
+          歌单 共{data?.songnum || data?.total}首
+        </Text>
+        {data?.songlist &&
+          data?.songlist.map((item: any, i: number) => (
+            <TouchableOpacity
+              style={styles.songBox}
+              key={item.songid}
+              onPress={() => goSongPage(item)}
+            >
+              {songListInfo.type === SongListType.Rank && (
+                <Text style={styles.songIndex}>{i + 1}</Text>
+              )}
+              <View>
+                <Text style={styles.songTitle}>
+                  {item.songname || item.title}
+                </Text>
+                <Text style={styles.singerName}>
+                  {handleSingerName(item.singer)}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          ))}
       </View>
     </View>
   );

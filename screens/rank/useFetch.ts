@@ -1,4 +1,4 @@
-import { ApiUrl, getPlayList, topDetails } from "../../../../server/api";
+import { ApiUrl, getPlayList, topDetails } from "../../server/api";
 import { useEffect, useState } from "react";
 
 export function useFetch() {
@@ -12,7 +12,7 @@ export function useFetch() {
       const id = data[index].topId;
       if (id === 201) continue;
       map[id] = data[index];
-      topDetails({ id, pageSize: 3 }).then((res) => {
+      topDetails({ id }).then((res) => {
         setTopRanckMap((oldData) => ({
           ...oldData,
           [id]: {

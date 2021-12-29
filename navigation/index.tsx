@@ -18,16 +18,19 @@ import Colors from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
 import NotFoundScreen from "../screens/NotFoundScreen";
 import Home from "../screens/home/Home";
-import Account from "../screens/Account/Account";
-import Singer from "../screens/Singer/Singer";
+import Account from "../screens/account/Account";
+import Singer from "../screens/singer/Singer";
 import {
   RootStackParamList,
   RootTabParamList,
   RootTabScreenProps,
 } from "../types";
 import LinkingConfiguration from "./LinkingConfiguration";
-import SongList from "../screens/SongList/SongList";
+import SongList from "../screens/songList/SongList";
 import Song from "../screens/Song/Song";
+import Sort from "../screens/sort/Sort";
+import Radio from "../screens/radio/Radio";
+import Rank from "../screens/rank/Rank";
 
 export default function Navigation({
   colorScheme,
@@ -71,6 +74,21 @@ function RootNavigator() {
       <Stack.Screen
         name="Singer"
         component={Singer}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Sort"
+        component={Sort}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Rank"
+        component={Rank}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Radio"
+        component={Radio}
         options={{ headerShown: false }}
       />
       <Stack.Screen

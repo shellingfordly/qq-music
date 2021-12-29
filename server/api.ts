@@ -79,9 +79,29 @@ export function searchSong(params: { key: string }) {
  * @description 获取榜单详情
  * @param id 默认 4
  */
-export function topDetails(params: { id: number }) {
+export function topDetails(params: { id: number; pageSize?: number }) {
   return http.request({
     url: "/top",
+    method: "GET",
+    params,
+  });
+}
+
+/**
+ * @description 根据分类获取歌单列表
+ * @param pageSize: 默认为 20
+ * @param pageNo: 默认为1
+ * @param sort: 默认是 5，// 5: 推荐，2: 最新，其他数字的排列值最后都会返回推荐
+ * @param category: 分类 id，默认 10000000 （全部），其他值从上面的分类接口获取
+ */
+export function getSongList(params: {
+  pageSize?: number;
+  pageNo?: number;
+  sort?: number;
+  category?: number;
+}) {
+  return http.request({
+    url: "/songlist/list",
     method: "GET",
     params,
   });
@@ -91,7 +111,7 @@ export function topDetails(params: { id: number }) {
  * @description 获取歌单详情
  * @param id 默认 4
  */
-export function getSongListDetails(params: { id: number }) {
+export function getSongListDetails(params: { id: number | string }) {
   return http.request({
     url: "/songlist",
     method: "GET",

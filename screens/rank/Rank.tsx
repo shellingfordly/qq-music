@@ -6,22 +6,27 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useFetch } from "./useFetch";
-import { View, Text } from "../../../../components/Themed";
+import { useLocalStore } from "mobx-react";
+import { View, Text } from "react-native";
+import { songStore } from "../../store/modules/songList";
 import React from "react";
 
 export default function RankPlayList() {
   const navigation = useNavigation();
   const { topRanckMap } = useFetch();
+  const store = useLocalStore(() => songStore);
 
   function onPress(song: any) {
-    navigation.navigate("SongList", {
-      id: song.topId,
+    store.setTheSongListInfo({
+      ...song,
+      isRank: true,
       imgUrl: song.picUrl,
-      title: song.info.title,
-      subTitle: song.info.titleDetail,
-      message: "更新时间：" + song.period,
-      type: "Rank",
-    } as any);
+      textOne: song.label,
+      textTwo: song.info.titleDetail,
+      textThree: `更新时间：${song.update}`,
+      textTotal: `排行榜 共${song.total}首`,
+    });
+    navigation.navigate("SongList");
   }
 
   return (

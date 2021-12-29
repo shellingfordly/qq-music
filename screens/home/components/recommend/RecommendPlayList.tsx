@@ -1,13 +1,9 @@
 import { useContext, useState } from "react";
-import { getSongListDetails } from "../../../../server/api";
 import { Button, Space } from "antd-mobile";
 import { SearchOutline } from "antd-mobile-icons";
-import { useLocalStore } from "mobx-react";
-import { songStore } from "../../../../store/modules/songList";
 import { useNavigation } from "@react-navigation/native";
 import { Text, TouchableOpacity, View } from "react-native";
 import { SearchContext } from "../../hooks/useContext";
-import { handleSingerName } from "../../../../utils/song";
 import useFetch from "./hooks/usefetch";
 import Banner from "./components/Banner";
 import PlayList from "./components/PlayList";
@@ -16,32 +12,19 @@ import { themeColor } from "../../../../utils/style";
 import { RootStackParamList } from "../../../../types";
 
 export default function RecommendPlayList({}) {
-  const store = useLocalStore(() => songStore);
   const navigation = useNavigation();
   const { setIsShowSearch } = useContext(SearchContext);
   const { playListData } = useFetch();
 
   async function itemTouchEnd(item: any) {
     try {
-      const { data: song } = await getSongListDetails({
-        id: item.content_id || item.tid,
-      });
-      store.setTheSongListInfo({
-        ...item,
-        isRank: false,
+      navigation.navigate("SongList", {
+        id: item.tid || item.content_id,
+        title: item.title,
         imgUrl: item.cover || item.cover_url_big,
-        textOne: item.title,
-        textTwo: song.nickname,
-        textThree: `播放量：${item.listen_num || item.access_num}`,
-        textTotal: `歌单 共${song.songnum}首`,
-        list: song.songlist.map((v: any) => ({
-          ...v,
-          id: v.albumid,
-          title: v.songname,
-          singerName: handleSingerName(v.singer),
-        })),
-      });
-      navigation.navigate("SongList");
+        subTitle: item.username || item.creator_info?.nick,
+        message: "播放量：" + (item.access_num || item.listen_num),
+      } as any);
     } catch (error) {}
   }
 
