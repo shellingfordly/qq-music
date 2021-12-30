@@ -1,4 +1,4 @@
-import { Image } from "antd-mobile";
+import { Image, Modal } from "antd-mobile";
 import { useEffect, useState } from "react";
 import {
   View,
@@ -9,85 +9,119 @@ import {
 } from "react-native";
 import API from "../../server/api";
 import { UserOutline, RightOutline } from "antd-mobile-icons";
-import { useLocalStore } from "mobx-react-lite";
-import { songStore } from "../../store/modules/songList";
 import { useNavigation } from "@react-navigation/core";
-import { handleSingerName } from "../../utils/song";
+import SetCookie from "./SetCookie";
+import { localStorage } from "../../utils/storage";
+import { ACCOUNT_KEY } from "../../constants/key";
 
 export default function Account() {
   const [userInfo, setUserInfo] = useState<any>({});
   const [userCreateSongList, setUserCreateSongList] = useState<any[]>([]);
-  const store = useLocalStore(() => songStore);
+  const [userCollectSongList, setUserCollectSongList] = useState<any[]>([]);
   const navigation = useNavigation();
+  const [visible, setVisible] = useState(false);
 
-  useEffect(() => {
-    API.getUserCreateSongList({
-      id: "1418504249",
-    }).then((res) => {
+  async function getAccountInfo() {
+    const id = await localStorage.getItem(ACCOUNT_KEY);
+    if (!id) {
+      return;
+    }
+    API.GetUserCreateSongList({ id }).then((res) => {
       const list = res.data.list;
       list.shift();
-      setUserInfo(res.data.creator);
+      setUserInfo(res.data?.creator || {});
       setUserCreateSongList(list);
     });
+
+    API.GetUserCollectSongList({ id }).then((res) => {
+      setUserCollectSongList(res.data.list);
+    });
+
+    API.GetUserCollectAlbum({ id });
+  }
+
+  useEffect(() => {
+    getAccountInfo();
   }, []);
 
-  async function onGoSongList(id: number) {
-    const { data } = await API.getSongListDetails({ id });
-    store.setTheSongListInfo({
-      ...data,
-      imgUrl: data.logo,
-      isRank: false,
-      textOne: data.dissname,
-      textTwo: data.nickname,
-      textThree: `播放量：${data.visitnum}`,
-      textTotal: `歌单 共${data.cur_song_num}首`,
-      list: data.songlist.map((v: any) => ({
-        ...v,
-        id: v.albumid,
-        title: v.songname,
-        singerName: handleSingerName(v.singer),
-      })),
-    });
-    navigation.navigate("SongList");
+  async function onGoSongList(song: any) {
+    navigation.navigate("SongList", {
+      id: song.tid || song.dissid,
+      title: song.diss_name || song.dissname,
+      imgUrl: song.diss_cover || song.logo,
+      subTitle: song.nickname || userInfo.hostname,
+      message: `播放量：${song.listen_num || song.listennum}`,
+    } as any);
+  }
+
+  function onHeadPress() {
+    setVisible(true);
+  }
+
+  function setAccount(acount: string) {
+    if (acount) {
+      getAccountInfo();
+    } else {
+      setUserInfo({});
+      setUserCreateSongList([]);
+    }
   }
 
   return (
     <View style={styles.container}>
+      <SetCookie
+        visible={visible}
+        setVisible={setVisible}
+        setAccount={setAccount}
+      />
       <View style={styles.topBox}>
         <View style={styles.topContent}>
-          <View style={styles.userHead}>
+          <TouchableOpacity style={styles.userHead} onPress={onHeadPress}>
             <UserOutline fontSize={50} />
-          </View>
+          </TouchableOpacity>
           <Text style={styles.userName}>{userInfo.hostname}</Text>
         </View>
       </View>
       <ScrollView style={styles.songListBox}>
-        <Text style={styles.songListTitle}>
-          歌单{userCreateSongList.length}
-        </Text>
-        {userCreateSongList.map((song) => (
-          <TouchableOpacity
-            style={styles.songListItem}
-            key={song.tid}
-            onPress={() => onGoSongList(song.tid)}
-          >
-            <Image
-              style={{ borderRadius: 10 }}
-              width={60}
-              height={60}
-              src={song.diss_cover}
-            />
-            <View style={styles.infoBox}>
-              <Text style={styles.songName}>{song.diss_name}</Text>
-              <Text style={styles.songCount}>
-                <Text style={{ marginRight: 5 }}>{song.song_cnt}首</Text>
-                <Text>{song.listen_num}次播放</Text>
-              </Text>
-            </View>
-            <View style={styles.iconBox}>
-              <RightOutline fontSize={18} style={{ color: "#666" }} />
-            </View>
-          </TouchableOpacity>
+        {[
+          ["我的歌单", userCreateSongList],
+          ["收藏歌单", userCollectSongList],
+        ].map(([title, list]: any) => (
+          <View style={{ marginBottom: 20 }} key={title}>
+            <Text style={styles.songListTitle}>
+              {title} {list.length}
+            </Text>
+            {list.map((song: any) => (
+              <TouchableOpacity
+                style={styles.songListItem}
+                key={song.tid || song.dissid}
+                onPress={() => onGoSongList(song)}
+              >
+                <View style={styles.itemInfo}>
+                  <Image
+                    style={{ borderRadius: 10 }}
+                    width={60}
+                    height={60}
+                    src={song.diss_cover || song.logo}
+                  />
+                  <View style={styles.infoBox}>
+                    <Text style={styles.songName}>
+                      {song.diss_name || song.dissname}
+                    </Text>
+                    <Text style={styles.songCount}>
+                      <Text style={{ marginRight: 5 }}>
+                        {song.song_cnt || song.songnum}首
+                      </Text>
+                      <Text>{song.listen_num || song.listennum}次播放</Text>
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.iconBox}>
+                  <RightOutline fontSize={18} style={{ color: "#666" }} />
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
         ))}
       </ScrollView>
     </View>
@@ -132,14 +166,19 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   songListItem: {
-    position: "relative",
     flexDirection: "row",
     marginBottom: 10,
+    justifyContent: "space-between",
+  },
+  itemInfo: {
+    flexDirection: "row",
+    flex: 1,
   },
   infoBox: {
     flexDirection: "column",
     marginLeft: 15,
     justifyContent: "center",
+    flex: 1,
   },
   songName: {
     fontSize: 14,
@@ -152,9 +191,8 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   iconBox: {
-    position: "absolute",
-    right: 0,
-    top: "50%",
-    marginTop: -10,
+    width: 20,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

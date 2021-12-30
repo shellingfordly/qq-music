@@ -1,3 +1,4 @@
+import { AxiosRequestConfig } from "axios";
 import { http } from "../utils/http";
 
 class API {
@@ -256,12 +257,35 @@ class API {
   }
 
   /**
+   * @description 获取用户收藏的专辑
+   * @param id: qq/wxuin
+   */
+  GetUserCollectAlbum(params: { id: string }) {
+    return http.request({
+      url: "/user/collect/album",
+      method: "get",
+      params,
+    });
+  }
+
+  /**
    * @description 电台分类
    */
   GetRadioCaregory() {
     return http.request({
       url: "/radio/category",
       method: "get",
+    });
+  }
+
+  /**
+   * @description 获取电台歌曲
+   */
+  GetRadioSong(params: { id: number }) {
+    return http.request({
+      url: "/radio",
+      method: "get",
+      params,
     });
   }
 }

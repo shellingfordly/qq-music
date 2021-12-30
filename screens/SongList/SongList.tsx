@@ -23,7 +23,7 @@ interface SongListInfo {
 
 export default function SongListPage({ route }: any) {
   const navigation = useNavigation();
-  const songListInfo: SongListInfo = route.params;
+  const [songListInfo] = useState<SongListInfo>(route.params);
   const [data, setData] = useState<any>({});
 
   useEffect(() => {
@@ -69,13 +69,13 @@ export default function SongListPage({ route }: any) {
       </View>
       <View style={styles.songList}>
         <Text style={styles.listTitle}>
-          歌单 共{data?.songnum || data?.total}首
+          歌单 共{data?.songnum || data?.total || data.cur_song_num}首
         </Text>
         {data?.songlist &&
           data?.songlist.map((item: any, i: number) => (
             <TouchableOpacity
               style={styles.songBox}
-              key={item.songid}
+              key={item.songid || item.id}
               onPress={() => goSongPage(item)}
             >
               {songListInfo.type === SongListType.Rank && (

@@ -8,7 +8,6 @@ export default function useLyric(songmid: number) {
     if (songmid) {
       API.GetSongLyric({ songmid }).then((res) => {
         setLyrics(handleLyric(res.data.lyric));
-        console.log(handleLyric(res.data.lyric));
       });
     }
   }, []);
@@ -22,17 +21,24 @@ function handleLyric(lyricStr: string) {
   let index = 0;
   let timeStart = 0;
 
+  const sliceTimeAndLyric = (value: string, i: number) => {
+    const sentence = lyricStr.slice(index, i).slice(10);
+    const times = value.replace(/\[|\]/g, "").split(":");
+    const time = Number(times[0]) * 60 + Number(times[1]);
+    lyricList.push([timeStart, time, sentence]);
+    timeStart = time;
+  };
+
   lyricStr.replace(reg, (value: string, i: number) => {
     if (index) {
-      const sentence = lyricStr.slice(index, i).match(/\](.+)/);
-      const times = value.replace(/\[|\]/g, "").split(":");
-      const time = Number(times[0]) * 60 + Number(times[1]);
-      lyricList.push([timeStart, time, sentence && sentence[1]]);
-      timeStart = time;
+      sliceTimeAndLyric(value, i);
     }
     index = i;
     return value;
   });
+
+  // 最后一句歌词
+  sliceTimeAndLyric(lyricStr.slice(index), lyricStr.length);
 
   return lyricList;
 }

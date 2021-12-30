@@ -1,5 +1,7 @@
 import API from "../../../../server/api";
 import { useEffect, useState } from "react";
+import { RANK_SONG_LIST_KEY } from "../../../../constants/key";
+import { localStorage } from "../../../../utils/storage";
 
 export function useFetch() {
   const [allRankList, setAllRankList] = useState<any[]>([]);
@@ -26,13 +28,13 @@ export function useFetch() {
 
   useEffect(() => {
     (async () => {
-      let local = localStorage.getItem("RankList");
+      let local = await localStorage.getItem(RANK_SONG_LIST_KEY);
       let res;
       if (local) {
-        res = JSON.parse(local);
+        res = local;
       } else {
         const res = await API.TopRankCategory();
-        localStorage.setItem("RankList", JSON.stringify(res));
+        localStorage.setItem(RANK_SONG_LIST_KEY, res);
       }
 
       const allData = res.data.reduce((p: any, n: any) => {

@@ -18,12 +18,11 @@ import {
 import { PauseIcon } from "../../components/icons/PauseIcon";
 import { themeColor } from "../../utils/style";
 import useLyric from "./hooks/useLyric";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function Song({ route }: any) {
   const songInfo = route.params;
-  const [songUrl, setSongUrl] = useState(
-    "http://isure.stream.qqmusic.qq.com/C4000004Uiq84QArne.m4a?guid=2796982635&vkey=CB371A2DE23DBF86AEB87A43D71897A2CFD1CF2AF5A0E04F7DF590D124DC491AC62BCAFDD9AE524A5AA68497F9A6A97729F82EE99D7A129E&uin=1418504249&fromtag=66"
-  );
+  const [songUrl, setSongUrl] = useState("");
   const { lyrics } = useLyric(songInfo.mid);
   const audioEle = useRef<any>(null);
   const [isPlay, setIsPlay] = useState(false);
@@ -31,24 +30,29 @@ export default function Song({ route }: any) {
   const [soundPercent, setSoundPercent] = useState(10);
   const [currentTime, setCurrentTime] = useState(0);
   const [playPercent, setPlayPercent] = useState(0);
+  const [left, setLeft] = useState(10);
+  const progressRef = useRef<any>(null);
 
   useEffect(() => {
-    audioEle.current.volume = soundPercent / 100;
-    audioEle.current.ontimeupdate = function () {
-      const newCurrentTime = audioEle.current.currentTime;
-      setCurrentTime(newCurrentTime);
-      setPlayPercent((newCurrentTime / audioEle.current.duration) * 100);
-    };
-    API.GetSongPlayUrl({ id: songInfo.mid }).then((res) => {
-      setSongUrl(res.data);
-    });
-    return () => {};
+    // audioEle.current.volume = soundPercent / 100;
+    // audioEle.current.ontimeupdate = function () {
+    //   const newCurrentTime = audioEle.current.currentTime;
+    //   setCurrentTime(newCurrentTime);
+    //   setPlayPercent((newCurrentTime / audioEle.current.duration) * 100);
+    // };
+    // API.GetSongPlayUrl({ id: songInfo.mid }).then((res) => {
+    //   if (res.data) {
+    //     setSongUrl(res.data);
+    //   }
+    // });
+    // return () => {};
   }, []);
 
   const lyricColorStyle = (lyric: [number, number, string | null]) => {
     const hasColor = lyric[0] < currentTime && currentTime < lyric[1];
     return {
       color: hasColor ? themeColor.primary : "",
+      marginBottom: 10,
     };
   };
 
@@ -76,70 +80,113 @@ export default function Song({ route }: any) {
     audioEle.current.volume = 0;
   }
 
+  function onTouchMove(e: any) {
+    const start = Number(progressRef.current.offsetLeft);
+    const end = Number(e.nativeEvent.changedTouches[0].clientX);
+    let mid = end - start;
+    if (end - start >= 80) {
+      mid = 80;
+    }
+    setLeft(mid);
+    setSoundPercent((mid / 80) * 100);
+    audioEle.current.volume = mid / 80;
+  }
+
+  const randomColor = () => {
+    let r = 0;
+    let g = 0;
+    let b = 0;
+    let colorLevel = 0;
+    while (colorLevel < 200) {
+      r = Math.random() * 255;
+      g = Math.random() * 255;
+      b = Math.random() * 255;
+      colorLevel = r * 0.299 + g * 0.587 + b * 0.114;
+    }
+    return `rgb(${r},${g},${b})`;
+  };
   return (
-    <View style={styles.container}>
-      <View style={styles.songInfo}>
-        <Text style={styles.songTitle}>{songInfo.title}</Text>
-        <Text style={styles.singerName}>{songInfo.singerName}</Text>
-        {songInfo.cover && (
-          <View style={styles.songImg}>
-            <Image width={200} height={200} src={songInfo.cover}></Image>
-          </View>
-        )}
-      </View>
-      <ScrollView style={styles.lyricBox}>
-        {lyrics.map((lyric) => (
-          <Text style={lyricColorStyle(lyric)} key={lyric[1]}>
-            {lyric[2]}
-          </Text>
-        ))}
-      </ScrollView>
-      <ProgressBar
-        percent={playPercent}
-        style={{
-          "--fill-color": themeColor.primary,
-        }}
-      />
-      <View style={styles.toolsBox}>
-        <View style={styles.btnBox}>
-          <TouchableOpacity style={styles.btn} onPress={onPlay}>
-            {isPlay && <PauseIcon />}
-            {!isPlay && <PlayOutline fontSize={20} />}
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.btn, { marginLeft: 20 }]}>
-            <HeartOutline fontSize={20} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.sound} onPress={onHandleSound}>
-            {hasSound && <SoundOutline fontSize={23} />}
-            {!hasSound && <SoundMuteOutline fontSize={23} />}
-          </TouchableOpacity>
-          <View style={styles.progressBarBox}>
-            <ProgressBar
-              percent={soundPercent}
-              style={{
-                "--fill-color": hasSound ? themeColor.primary : "#ccc",
-              }}
-            />
-          </View>
+    <>
+      <LinearGradient
+        style={styles.bgContainer}
+        colors={[randomColor(), randomColor()]}
+      ></LinearGradient>
+      <View style={styles.container}>
+        <View style={styles.songInfo}>
+          <Text style={styles.songTitle}>{songInfo.title}</Text>
+          <Text style={styles.singerName}>{songInfo.singerName}</Text>
+          {songInfo.cover && (
+            <View style={styles.songImg}>
+              <Image width={200} height={200} src={songInfo.cover}></Image>
+            </View>
+          )}
         </View>
-        <TouchableOpacity style={styles.playList}>
-          <UnorderedListOutline fontSize={20} />
-        </TouchableOpacity>
+        <ScrollView style={styles.lyricBox}>
+          {lyrics.map((lyric) => (
+            <Text style={lyricColorStyle(lyric)} key={lyric[1]}>
+              {lyric[2]}
+            </Text>
+          ))}
+        </ScrollView>
+        <ProgressBar
+          percent={playPercent}
+          style={{
+            "--fill-color": themeColor.primary,
+          }}
+        />
+        <View style={styles.toolsBox}>
+          <View style={styles.btnBox}>
+            <TouchableOpacity style={styles.btn} onPress={onPlay}>
+              {isPlay && <PauseIcon />}
+              {!isPlay && <PlayOutline fontSize={20} />}
+            </TouchableOpacity>
+            <TouchableOpacity style={[styles.btn, { marginLeft: 20 }]}>
+              <HeartOutline fontSize={20} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.sound} onPress={onHandleSound}>
+              {hasSound && <SoundOutline fontSize={23} />}
+              {!hasSound && <SoundMuteOutline fontSize={23} />}
+            </TouchableOpacity>
+            <View ref={progressRef} style={styles.progressBarBox}>
+              <ProgressBar
+                percent={soundPercent}
+                style={{
+                  "--fill-color": hasSound ? themeColor.primary : "#ccc",
+                }}
+              />
+              <View
+                style={[styles.tounchBar, { left }]}
+                onTouchMove={onTouchMove}
+              ></View>
+            </View>
+          </View>
+          <TouchableOpacity style={styles.playList}>
+            <UnorderedListOutline fontSize={20} />
+          </TouchableOpacity>
+        </View>
+        <audio
+          style={{ display: "none" }}
+          ref={audioEle}
+          src={songUrl}
+          controls
+        />
       </View>
-      <audio
-        style={{ display: "none" }}
-        ref={audioEle}
-        src={songUrl}
-        controls
-      />
-    </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "rgb(250, 250, 250)",
+  },
+  bgContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    opacity: 0.3,
+    flex: 1,
+    width: "100vw",
+    height: "100vh",
   },
   songInfo: {
     paddingTop: 20,
@@ -166,15 +213,16 @@ const styles = StyleSheet.create({
   },
   lyricBox: {
     height: "40vh",
+    paddingTop: 20,
     overflow: "scroll",
     textAlign: "center",
-    backgroundColor: "white",
   },
   toolsBox: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     height: 70,
+    marginBottom: 20,
   },
   btnBox: {
     flexDirection: "row",
@@ -193,8 +241,19 @@ const styles = StyleSheet.create({
     marginLeft: 20,
   },
   progressBarBox: {
+    position: "relative",
     width: 80,
     marginLeft: 8,
+  },
+  tounchBar: {
+    position: "absolute",
+    top: -3,
+    left: 0,
+    marginLeft: -5,
+    width: 10,
+    height: 10,
+    borderRadius: 100,
+    backgroundColor: themeColor.primary,
   },
   playList: {
     display: "flex",

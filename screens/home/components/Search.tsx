@@ -12,6 +12,8 @@ import API from "../../../server/api";
 import { DeleteOutline } from "antd-mobile-icons";
 import { useNavigation } from "@react-navigation/native";
 import { handleSingerName } from "../../../utils/song";
+import { SEARCH_HISTORY_KEY } from "../../../constants/key";
+import { localStorage } from "../../../utils/storage";
 
 export default function Search() {
   const { setIsShowSearch } = useContext(SearchContext);
@@ -22,9 +24,8 @@ export default function Search() {
   const [searchHistory, setSearchHistore] = useState<string[]>([]);
   const navigation = useNavigation();
 
-  function getSearchHistory(): any[] {
-    const data = localStorage.getItem("SearchHistory");
-
+  async function getSearchHistory(): Promise<any[]> {
+    const data = await localStorage.getItem(SEARCH_HISTORY_KEY);
     if (data) {
       return JSON.parse(data);
     }
@@ -37,7 +38,9 @@ export default function Search() {
         setHotWords(res.data);
       });
     } catch (error) {}
-    setSearchHistore(getSearchHistory());
+    getSearchHistory().then((res) => {
+      setSearchHistore(res);
+    });
   }, []);
 
   function onCancel() {
@@ -56,7 +59,7 @@ export default function Search() {
   }
 
   function onDeleteHistory() {
-    localStorage.removeItem("SearchHistory");
+    localStorage.removeItem(SEARCH_HISTORY_KEY);
     setSearchHistore([]);
   }
 
@@ -64,10 +67,10 @@ export default function Search() {
     setSearchKey(value);
     setIsShowHotSearch(!value);
     if (value) {
-      const history = getSearchHistory();
+      const history = await getSearchHistory();
       history.unshift(value);
       const data: any[] = [...new Set(history)];
-      localStorage.setItem("SearchHistory", JSON.stringify(data));
+      localStorage.setItem(SEARCH_HISTORY_KEY, data);
       setSearchHistore(data);
     }
     try {

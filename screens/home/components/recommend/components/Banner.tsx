@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Image } from "antd-mobile";
-import Swiper from "react-native-swiper";
+import Swiper from "../../../../../components/Swiper";
 import API from "../../../../../server/api";
 import { themeColor } from "../../../../../utils/style";
 
