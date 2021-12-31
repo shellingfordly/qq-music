@@ -14,7 +14,7 @@ export default function RankPlayList() {
   const { topRanckMap } = useFetch();
 
   function onPress(song: any) {
-    navigation.navigate("SongList", {
+    navigation.navigate("SongListPage", {
       id: song.topId,
       imgUrl: song.picUrl,
       title: song.info.title,

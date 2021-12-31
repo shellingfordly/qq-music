@@ -165,7 +165,7 @@ class API {
    * @description 获取歌词
    * @param songmid
    */
-  GetSongLyric(params: { songmid: number }) {
+  GetSongLyric(params: { songmid: string }) {
     return http.request({
       url: "/lyric",
       method: "GET",
@@ -177,7 +177,7 @@ class API {
    * @description 获取播放链接
    * @param id: songmid
    */
-  GetSongPlayUrl(params: { id: number }) {
+  GetSongPlayUrl(params: { id: string }) {
     return http.request({
       url: "/song/urls",
       method: "GET",

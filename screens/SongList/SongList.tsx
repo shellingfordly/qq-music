@@ -5,6 +5,8 @@ import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import API from "../../server/api";
 import { handleSingerName } from "../../utils/song";
+import { localStorage } from "../../utils/storage";
+import { PLAYING_lIST_KEY } from "../../constants/key";
 
 enum SongListType {
   Rank = "Rank",
@@ -44,12 +46,26 @@ export default function SongListPage({ route }: any) {
   }, []);
 
   function goSongPage(song: any) {
-    navigation.navigate("Song", {
+    navigation.navigate("SongPage", {
       title: song.songname,
       cover: song.cover,
       singerName: handleSingerName(song.singer),
       mid: song.mid || song.songmid,
     } as any);
+  }
+
+  // 播放歌单
+  function onPlayAllSongList() {
+    if (data.songlist && data.songlist.length) {
+      const list = data.songlist.map((song: any) => ({
+        title: song.songname,
+        cover: song.cover,
+        singerName: handleSingerName(song.singer),
+        mid: song.mid || song.songmid,
+      }));
+      localStorage.setItem(PLAYING_lIST_KEY, list);
+      goSongPage(data.songlist[0]);
+    }
   }
 
   return (
@@ -62,7 +78,7 @@ export default function SongListPage({ route }: any) {
         <Text style={styles.titleDetail}>{songListInfo.subTitle}</Text>
         <Text style={[styles.update]}>{songListInfo.message}</Text>
         <View style={styles.playBtn}>
-          <Button color="primary">
+          <Button color="primary" onClick={onPlayAllSongList}>
             <PlayOutline />
           </Button>
         </View>

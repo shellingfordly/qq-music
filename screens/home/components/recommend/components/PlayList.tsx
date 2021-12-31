@@ -35,26 +35,27 @@ export default function PlayList({
         pagingEnabled={true}
         style={styles.playContainer}
       >
-        {data.playList.map((item) => (
-          <TouchableOpacity
-            style={styles.playItem}
-            key={item.tid || item.content_id}
-            onPress={() => onPress(item)}
-          >
-            <View style={styles.playImg}>
-              <Image
-                src={item.cover || item.cover_url_big}
-                width={100}
-                height={100}
-                style={{ borderRadius: 10 }}
-              />
-              <Text style={styles.playNum}>
-                {((item.listen_num || item.access_num) / 10000).toFixed(1)}万
-              </Text>
-            </View>
-            <Text style={styles.playTitle}>{item.title}</Text>
-          </TouchableOpacity>
-        ))}
+        {data.playList &&
+          data.playList.map((item) => (
+            <TouchableOpacity
+              style={styles.playItem}
+              key={item.tid || item.content_id}
+              onPress={() => onPress(item)}
+            >
+              <View style={styles.playImg}>
+                <Image
+                  src={item.cover || item.cover_url_big}
+                  width={100}
+                  height={100}
+                  style={{ borderRadius: 10 }}
+                />
+                <Text style={styles.playNum}>
+                  {((item.listen_num || item.access_num) / 10000).toFixed(1)}万
+                </Text>
+              </View>
+              <Text style={styles.playTitle}>{item.title}</Text>
+            </TouchableOpacity>
+          ))}
       </ScrollView>
     </>
   );

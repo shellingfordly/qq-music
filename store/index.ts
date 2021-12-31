@@ -1,8 +1,9 @@
-import { songStore } from './modules/songList'
+import { makeAutoObservable } from "mobx";
 
-const store = {
-  songStore
-
+class Store {
+  constructor() {
+    makeAutoObservable(this);
+  }
 }
 
-export default store
+export const store = new Store();

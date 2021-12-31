@@ -1,20 +1,6 @@
 import { useEffect, useState } from "react";
 import API from "../../../server/api";
 
-export default function useLyric(songmid: number) {
-  const [lyrics, setLyrics] = useState<[number, number, string | null][]>([]);
-
-  useEffect(() => {
-    if (songmid) {
-      API.GetSongLyric({ songmid }).then((res) => {
-        setLyrics(handleLyric(res.data.lyric));
-      });
-    }
-  }, []);
-
-  return { lyrics, setLyrics };
-}
-
 function handleLyric(lyricStr: string) {
   const lyricList: [number, number, string | null][] = [];
   const reg = /\[\d{2}:\d{2}.\d{2}\]/g;
@@ -41,4 +27,20 @@ function handleLyric(lyricStr: string) {
   sliceTimeAndLyric(lyricStr.slice(index), lyricStr.length);
 
   return lyricList;
+}
+
+export default function useLyric(playingSong: any) {
+  const [lyrics, setLyrics] = useState<[number, number, string | null][]>([]);
+
+  useEffect(() => {
+    if (playingSong.mid) {
+      API.GetSongLyric({ songmid: playingSong.mid }).then((res) => {
+        const list = handleLyric(res.data.lyric);
+        list.shift();
+        setLyrics(list);
+      });
+    }
+  }, [playingSong]);
+
+  return { lyrics, setLyrics };
 }

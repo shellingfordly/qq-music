@@ -2,6 +2,7 @@ import { Button, Input, NavBar, Popup, Toast } from "antd-mobile";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { ACCOUNT_KEY } from "../../constants/key";
+import { cache } from "../../utils/cookie";
 import { localStorage } from "../../utils/storage";
 
 export default function SetCookie({ visible, setVisible, setAccount }: any) {
@@ -15,7 +16,11 @@ export default function SetCookie({ visible, setVisible, setAccount }: any) {
     })();
   }, []);
 
-  function onSetCookie() {}
+  function onSetCookie() {
+    cache
+      .parseCookie(cookie)
+      .forEach(([name, value]) => cache.setCookie(name, value));
+  }
 
   function onGetAccountSongList() {
     localStorage.setItem(ACCOUNT_KEY, qq);

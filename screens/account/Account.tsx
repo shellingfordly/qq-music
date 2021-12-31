@@ -1,4 +1,4 @@
-import { Image, Modal } from "antd-mobile";
+import { Image } from "antd-mobile";
 import { useEffect, useState } from "react";
 import {
   View,
@@ -21,6 +21,10 @@ export default function Account() {
   const navigation = useNavigation();
   const [visible, setVisible] = useState(false);
 
+  useEffect(() => {
+    getAccountInfo();
+  }, []);
+
   async function getAccountInfo() {
     const id = await localStorage.getItem(ACCOUNT_KEY);
     if (!id) {
@@ -37,15 +41,21 @@ export default function Account() {
       setUserCollectSongList(res.data.list);
     });
 
-    API.GetUserCollectAlbum({ id });
+    API.UserLookCookie().then(({ data }) => {
+      if (data.uin) {
+        API.GetUserInfo({ id }).then((res) => {
+          setUserInfo((oldInfo: any) => ({
+            ...oldInfo,
+            bgUrl: res?.data?.creator?.backpic.picurl,
+            headUrl: res?.data?.creator?.headpic,
+          }));
+        });
+      }
+    });
   }
 
-  useEffect(() => {
-    getAccountInfo();
-  }, []);
-
   async function onGoSongList(song: any) {
-    navigation.navigate("SongList", {
+    navigation.navigate("SongListPage", {
       id: song.tid || song.dissid,
       title: song.diss_name || song.dissname,
       imgUrl: song.diss_cover || song.logo,
@@ -75,9 +85,21 @@ export default function Account() {
         setAccount={setAccount}
       />
       <View style={styles.topBox}>
+        <Image
+          style={styles.topBg}
+          src={userInfo.bgUrl || require("../../assets/images/account-bg.jpg")}
+        />
         <View style={styles.topContent}>
           <TouchableOpacity style={styles.userHead} onPress={onHeadPress}>
-            <UserOutline fontSize={50} />
+            {!userInfo.headUrl && <UserOutline fontSize={50} />}
+            {userInfo.headUrl && (
+              <Image
+                width={80}
+                height={80}
+                style={{ borderRadius: 100 }}
+                src={userInfo.headUrl}
+              />
+            )}
           </TouchableOpacity>
           <Text style={styles.userName}>{userInfo.hostname}</Text>
         </View>
@@ -135,11 +157,16 @@ const styles = StyleSheet.create({
   topBox: {
     position: "relative",
     height: "30%",
-    padding: 20,
-    backgroundColor: "#aaa",
+  },
+  topBg: {
+    position: "absolute",
+    width: "100%",
+    top: 0,
+    left: 0,
   },
   topContent: {
     position: "absolute",
+    left: 20,
     bottom: 20,
   },
   userHead: {

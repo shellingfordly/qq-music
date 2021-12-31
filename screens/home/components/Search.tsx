@@ -82,7 +82,7 @@ export default function Search() {
   }
 
   function goSongPage(song: any) {
-    navigation.navigate("Song", {
+    navigation.navigate("SongPage", {
       cover: song.cover,
       title: song.songname,
       mid: song.songmid,

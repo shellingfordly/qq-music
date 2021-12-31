@@ -1,6 +1,6 @@
 import { Tabs } from "antd-mobile";
 import { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Dimensions } from "react-native";
 import API from "../../server/api";
 import { navlist } from "./constants";
 import { Image } from "antd-mobile";
@@ -10,6 +10,8 @@ export default function Sort() {
   const [songListId, setSongListId] = useState(133);
   const [songLists, setSongLists] = useState([]);
   const navigation = useNavigation();
+  const { width } = Dimensions.get("window");
+  const itemWidth = (width - 54) / 3;
 
   const getSongListApi = async (id = songListId) => {
     const res = await API.GetSongList({ category: id });
@@ -28,7 +30,7 @@ export default function Sort() {
   }
 
   function onGoSongList(item: any) {
-    navigation.navigate("SongList", {
+    navigation.navigate("SongListPage", {
       id: item.dissid,
       title: item.dissname,
       imgUrl: item.imgurl,
@@ -57,16 +59,16 @@ export default function Sort() {
             {songLists.map((item: any) => (
               <TouchableOpacity
                 onPress={() => onGoSongList(item)}
-                style={{ width: 100, marginBottom: 20 }}
+                style={{ width: itemWidth }}
                 key={item.dissid}
               >
                 <Image
                   src={item.imgurl}
-                  width={100}
-                  height={100}
+                  width={itemWidth}
+                  height={itemWidth}
                   style={{ borderRadius: 10 }}
                 ></Image>
-                <Text style={{ fontSize: 12, marginTop: 10 }}>
+                <Text style={{ fontSize: 12, marginTop: 10, marginBottom: 10 }}>
                   {item.dissname}
                 </Text>
               </TouchableOpacity>

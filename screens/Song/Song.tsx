@@ -19,34 +19,40 @@ import { PauseIcon } from "../../components/icons/PauseIcon";
 import { themeColor } from "../../utils/style";
 import useLyric from "./hooks/useLyric";
 import { LinearGradient } from "expo-linear-gradient";
+import PlayingSongList from "./components/PlayingList";
+import SoundProgressBar from "./components/SoundProgressBar";
+import Background from "../../components/Background";
 
 export default function Song({ route }: any) {
-  const songInfo = route.params;
+  const [playingSong, setPlayingSong] = useState<any>(route.params);
   const [songUrl, setSongUrl] = useState("");
-  const { lyrics } = useLyric(songInfo.mid);
+  const { lyrics } = useLyric(playingSong);
   const audioEle = useRef<any>(null);
   const [isPlay, setIsPlay] = useState(false);
   const [hasSound, setHasSound] = useState(true);
   const [soundPercent, setSoundPercent] = useState(10);
   const [currentTime, setCurrentTime] = useState(0);
   const [playPercent, setPlayPercent] = useState(0);
-  const [left, setLeft] = useState(10);
-  const progressRef = useRef<any>(null);
+  const [visible, setVisible] = useState(false);
 
+  // 初始化Audio
   useEffect(() => {
-    // audioEle.current.volume = soundPercent / 100;
-    // audioEle.current.ontimeupdate = function () {
-    //   const newCurrentTime = audioEle.current.currentTime;
-    //   setCurrentTime(newCurrentTime);
-    //   setPlayPercent((newCurrentTime / audioEle.current.duration) * 100);
-    // };
-    // API.GetSongPlayUrl({ id: songInfo.mid }).then((res) => {
-    //   if (res.data) {
-    //     setSongUrl(res.data);
-    //   }
-    // });
-    // return () => {};
+    audioEle.current.volume = soundPercent / 100;
+    audioEle.current.ontimeupdate = function () {
+      const newCurrentTime = audioEle.current.currentTime;
+      setCurrentTime(newCurrentTime);
+      setPlayPercent((newCurrentTime / audioEle.current.duration) * 100);
+    };
   }, []);
+
+  // 获取播放url
+  useEffect(() => {
+    API.GetSongPlayUrl({ id: playingSong.mid }).then((res) => {
+      if (res.data) {
+        setSongUrl(res.data[playingSong.mid]);
+      }
+    });
+  }, [playingSong]);
 
   const lyricColorStyle = (lyric: [number, number, string | null]) => {
     const hasColor = lyric[0] < currentTime && currentTime < lyric[1];
@@ -80,48 +86,28 @@ export default function Song({ route }: any) {
     audioEle.current.volume = 0;
   }
 
-  function onTouchMove(e: any) {
-    const start = Number(progressRef.current.offsetLeft);
-    const end = Number(e.nativeEvent.changedTouches[0].clientX);
-    let mid = end - start;
-    if (end - start >= 80) {
-      mid = 80;
-    }
-    setLeft(mid);
-    setSoundPercent((mid / 80) * 100);
-    audioEle.current.volume = mid / 80;
+  function onMoveDistance(distance: number) {
+    setSoundPercent(distance);
+    audioEle.current.volume = distance / 100;
   }
 
-  const randomColor = () => {
-    let r = 0;
-    let g = 0;
-    let b = 0;
-    let colorLevel = 0;
-    while (colorLevel < 200) {
-      r = Math.random() * 255;
-      g = Math.random() * 255;
-      b = Math.random() * 255;
-      colorLevel = r * 0.299 + g * 0.587 + b * 0.114;
-    }
-    return `rgb(${r},${g},${b})`;
-  };
   return (
     <>
-      <LinearGradient
-        style={styles.bgContainer}
-        colors={[randomColor(), randomColor()]}
-      ></LinearGradient>
+      <Background />
       <View style={styles.container}>
         <View style={styles.songInfo}>
-          <Text style={styles.songTitle}>{songInfo.title}</Text>
-          <Text style={styles.singerName}>{songInfo.singerName}</Text>
-          {songInfo.cover && (
+          <Text style={styles.songTitle}>{playingSong.title}</Text>
+          <Text style={styles.singerName}>{playingSong.singerName}</Text>
+          {playingSong.cover && (
             <View style={styles.songImg}>
-              <Image width={200} height={200} src={songInfo.cover}></Image>
+              <Image width={200} height={200} src={playingSong.cover}></Image>
             </View>
           )}
         </View>
-        <ScrollView style={styles.lyricBox}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          style={styles.lyricBox}
+        >
           {lyrics.map((lyric) => (
             <Text style={lyricColorStyle(lyric)} key={lyric[1]}>
               {lyric[2]}
@@ -147,20 +133,16 @@ export default function Song({ route }: any) {
               {hasSound && <SoundOutline fontSize={23} />}
               {!hasSound && <SoundMuteOutline fontSize={23} />}
             </TouchableOpacity>
-            <View ref={progressRef} style={styles.progressBarBox}>
-              <ProgressBar
-                percent={soundPercent}
-                style={{
-                  "--fill-color": hasSound ? themeColor.primary : "#ccc",
-                }}
-              />
-              <View
-                style={[styles.tounchBar, { left }]}
-                onTouchMove={onTouchMove}
-              ></View>
-            </View>
+            <SoundProgressBar
+              isMove={hasSound}
+              soundPercent={soundPercent}
+              onMoveDistance={onMoveDistance}
+            ></SoundProgressBar>
           </View>
-          <TouchableOpacity style={styles.playList}>
+          <TouchableOpacity
+            style={styles.playList}
+            onPress={() => setVisible(true)}
+          >
             <UnorderedListOutline fontSize={20} />
           </TouchableOpacity>
         </View>
@@ -171,6 +153,12 @@ export default function Song({ route }: any) {
           controls
         />
       </View>
+      <PlayingSongList
+        visible={visible}
+        setVisible={setVisible}
+        playingSong={playingSong}
+        setPlayingSong={setPlayingSong}
+      />
     </>
   );
 }
@@ -178,15 +166,6 @@ export default function Song({ route }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  bgContainer: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    opacity: 0.3,
-    flex: 1,
-    width: "100vw",
-    height: "100vh",
   },
   songInfo: {
     paddingTop: 20,
@@ -199,12 +178,11 @@ const styles = StyleSheet.create({
   },
   singerName: {
     textAlign: "center",
-    marginBottom: 20,
   },
   songImg: {
     width: 200,
     height: 200,
-    margin: "auto",
+    margin: "20px auto",
     overflow: "hidden",
     borderRadius: 10,
     shadowColor: "#eee",
@@ -213,7 +191,7 @@ const styles = StyleSheet.create({
   },
   lyricBox: {
     height: "40vh",
-    paddingTop: 20,
+    paddingBottom: 20,
     overflow: "scroll",
     textAlign: "center",
   },
@@ -222,7 +200,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     height: 70,
-    marginBottom: 20,
   },
   btnBox: {
     flexDirection: "row",

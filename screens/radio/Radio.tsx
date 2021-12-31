@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import API from "../../server/api";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Dimensions,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Image, Tabs } from "antd-mobile";
 import { localStorage } from "../../utils/storage";
 import { PLAYING_SONG_LIST_KEY } from "../../constants/key";
@@ -8,6 +14,8 @@ import { PlayOutline } from "antd-mobile-icons";
 
 export default function Radio() {
   const [radioList, setRadioList] = useState([]);
+  const { width } = Dimensions.get("window");
+  const imgWidth = (width - 54) / 3;
 
   useEffect(() => {
     API.GetRadioCaregory().then((res) => {
@@ -43,8 +51,8 @@ export default function Radio() {
                   <View style={{ position: "relative" }}>
                     <Image
                       src={radio.pic_url}
-                      width={100}
-                      height={100}
+                      width={imgWidth}
+                      height={imgWidth}
                       style={{ borderRadius: 100 }}
                     />
                     <View style={styles.radioIcon}>
@@ -70,7 +78,6 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
   },
   radioItem: {
-    width: 100,
     marginBottom: 20,
   },
   radioIcon: {

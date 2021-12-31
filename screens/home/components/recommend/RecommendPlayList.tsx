@@ -18,7 +18,7 @@ export default function RecommendPlayList({}) {
 
   async function itemTouchEnd(item: any) {
     try {
-      navigation.navigate("SongList", {
+      navigation.navigate("SongListPage", {
         id: item.tid || item.content_id,
         title: item.title,
         imgUrl: item.cover || item.cover_url_big,

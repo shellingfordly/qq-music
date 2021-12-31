@@ -62,32 +62,32 @@ function RootNavigator() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="Song"
+        name="SongPage"
         component={Song}
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="SongList"
+        name="SongListPage"
         component={SongList}
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="Singer"
+        name="SingerPage"
         component={Singer}
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="Sort"
+        name="SongSortPage"
         component={Sort}
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="Rank"
+        name="SongRankPage"
         component={Rank}
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="Radio"
+        name="RadioPage"
         component={Radio}
         options={{ headerShown: false }}
       />
@@ -111,7 +111,7 @@ function BottomTabNavigator() {
 
   return (
     <BottomTab.Navigator
-      initialRouteName="Account"
+      initialRouteName="Home"
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme].tint,
       }}

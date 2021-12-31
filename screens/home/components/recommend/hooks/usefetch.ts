@@ -15,23 +15,23 @@ export default function useFetch() {
   const [playListData, setPlayListData] = useState<PlayListProps[]>([]);
 
   // 获取用户日推，需要cookie
-  useEffect(() => {
-    API.UserLookCookie().then((res) => {
-      if (res.data.uin) {
-        API.DailyRecommend().then((res) => {
-          setPlayListData((data) => {
-            return [
-              {
-                title: "每日推荐",
-                playList: res.data.list,
-              },
-              ...data,
-            ];
-          });
-        });
-      }
-    });
-  }, []);
+  // useEffect(() => {
+  //   API.UserLookCookie().then((res) => {
+  //     if (res.data.uin) {
+  //       API.DailyRecommend().then((res) => {
+  //         setPlayListData((data) => {
+  //           return [
+  //             {
+  //               title: "每日推荐",
+  //               playList: res.data.list,
+  //             },
+  //             ...data,
+  //           ];
+  //         });
+  //       });
+  //     }
+  //   });
+  // }, []);
 
   // 获取 官方歌单 达人歌单
   useEffect(() => {
@@ -52,9 +52,9 @@ export default function useFetch() {
   }, []);
 
   // 分类专区
-  useEffect(() => {
-    API.SongListCategory().then((res) => {});
-  }, []);
+  // useEffect(() => {
+  //   API.SongListCategory().then((res) => {});
+  // }, []);
 
   return { playListData };
 }
