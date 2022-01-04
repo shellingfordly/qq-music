@@ -19,12 +19,10 @@ export default function SetCookie({ visible, setVisible, setAccount }: any) {
   }, []);
 
   function onSetCookie() {
-    const cookieMap: any = {};
+    localStorage.setItem(COOKIE_KEY, cookie);
     cache.parseCookie(cookie).forEach(([name, value]) => {
-      cookieMap[name] = value;
       cache.setCookie(name, value);
     });
-    localStorage.setItem(COOKIE_KEY, cookieMap);
     Toast.show({
       content: "Cookie设置成功！",
       position: "top",

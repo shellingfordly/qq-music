@@ -288,6 +288,28 @@ class API {
       params,
     });
   }
+
+  /**
+   * @description 获取专辑
+   */
+  GetAlbum(params: { albummid: string }) {
+    return http.request({
+      url: "/album",
+      method: "get",
+      params,
+    });
+  }
+
+  /**
+   * @description 获取专辑内歌曲
+   */
+  GetAlbumSongs(params: { albummid: string }) {
+    return http.request({
+      url: "/album/songs",
+      method: "get",
+      params,
+    });
+  }
 }
 
 export default new API();

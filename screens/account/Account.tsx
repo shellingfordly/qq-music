@@ -23,15 +23,20 @@ export default function Account() {
 
   useEffect(() => {
     getAccountInfo();
-  }, []);
+  }, [visible]);
 
   async function getAccountInfo() {
     const account = await localStorage.getItem(ACCOUNT_KEY);
-    const cookie = await localStorage.getItem(COOKIE_KEY);
+    const cookie: string = await localStorage.getItem(COOKIE_KEY);
     if (!account && !cookie) {
       return;
     }
-    const id = account || cookie.uin;
+    let uin = "";
+    cookie.replace(/uin=(\d+)/g, (a, b) => {
+      uin = b;
+      return a;
+    });
+    const id = account || uin;
     API.GetUserCreateSongList({ id }).then((res) => {
       const list = res.data.list;
       list.shift();
