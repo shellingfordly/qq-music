@@ -126,9 +126,9 @@ export default function Song({ route }: any) {
               {isPlay && <PauseIcon />}
               {!isPlay && <PlayOutline fontSize={20} />}
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.btn, { marginLeft: 20 }]}>
+            {/* <TouchableOpacity style={[styles.btn, { marginLeft: 20 }]}>
               <HeartOutline fontSize={20} />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <TouchableOpacity style={styles.sound} onPress={onHandleSound}>
               {hasSound && <SoundOutline fontSize={23} />}
               {!hasSound && <SoundMuteOutline fontSize={23} />}

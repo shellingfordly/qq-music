@@ -12,7 +12,7 @@ import { UserOutline, RightOutline } from "antd-mobile-icons";
 import { useNavigation } from "@react-navigation/core";
 import SetCookie from "./SetCookie";
 import { localStorage } from "../../utils/storage";
-import { ACCOUNT_KEY } from "../../constants/key";
+import { ACCOUNT_KEY, COOKIE_KEY } from "../../constants/key";
 
 export default function Account() {
   const [userInfo, setUserInfo] = useState<any>({});
@@ -26,10 +26,12 @@ export default function Account() {
   }, []);
 
   async function getAccountInfo() {
-    const id = await localStorage.getItem(ACCOUNT_KEY);
-    if (!id) {
+    const account = await localStorage.getItem(ACCOUNT_KEY);
+    const cookie = await localStorage.getItem(COOKIE_KEY);
+    if (!account && !cookie) {
       return;
     }
+    const id = account || cookie.uin;
     API.GetUserCreateSongList({ id }).then((res) => {
       const list = res.data.list;
       list.shift();
@@ -41,16 +43,12 @@ export default function Account() {
       setUserCollectSongList(res.data.list);
     });
 
-    API.UserLookCookie().then(({ data }) => {
-      if (data.uin) {
-        API.GetUserInfo({ id }).then((res) => {
-          setUserInfo((oldInfo: any) => ({
-            ...oldInfo,
-            bgUrl: res?.data?.creator?.backpic.picurl,
-            headUrl: res?.data?.creator?.headpic,
-          }));
-        });
-      }
+    API.GetUserInfo({ id }).then((res) => {
+      setUserInfo((oldInfo: any) => ({
+        ...oldInfo,
+        bgUrl: res?.data?.creator?.backpic.picurl,
+        headUrl: res?.data?.creator?.headpic,
+      }));
     });
   }
 

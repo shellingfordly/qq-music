@@ -1,7 +1,7 @@
 import { Button, Input, NavBar, Popup, Toast } from "antd-mobile";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { ACCOUNT_KEY } from "../../constants/key";
+import { ACCOUNT_KEY, COOKIE_KEY } from "../../constants/key";
 import { cache } from "../../utils/cookie";
 import { localStorage } from "../../utils/storage";
 
@@ -12,14 +12,24 @@ export default function SetCookie({ visible, setVisible, setAccount }: any) {
   useEffect(() => {
     (async () => {
       const account = await localStorage.getItem(ACCOUNT_KEY);
-      setQQ(account);
+      const c = await localStorage.getItem(COOKIE_KEY);
+      account && setQQ(account);
+      c && setCookie(c);
     })();
   }, []);
 
   function onSetCookie() {
-    cache
-      .parseCookie(cookie)
-      .forEach(([name, value]) => cache.setCookie(name, value));
+    const cookieMap: any = {};
+    cache.parseCookie(cookie).forEach(([name, value]) => {
+      cookieMap[name] = value;
+      cache.setCookie(name, value);
+    });
+    localStorage.setItem(COOKIE_KEY, cookieMap);
+    Toast.show({
+      content: "Cookie设置成功！",
+      position: "top",
+    });
+    setVisible(false);
   }
 
   function onGetAccountSongList() {

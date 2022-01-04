@@ -3,3 +3,4 @@ export const RANK_SONG_LIST_KEY = "RANK_SONG_LIST_KEY";
 export const PLAYING_SONG_LIST_KEY = "PLAYING_SONG_LIST_KEY";
 export const ACCOUNT_KEY = "ACCOUNT_KEY";
 export const PLAYING_lIST_KEY = "PLAYING_lIST_KEY";
+export const COOKIE_KEY = "COOKIE_KEY";
