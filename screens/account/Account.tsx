@@ -14,8 +14,7 @@ import SetCookie from "./SetCookie";
 import { localStorage } from "../../utils/storage";
 import { ACCOUNT_KEY, COOKIE_KEY } from "../../constants/key";
 
-async function getAccountFromCookie() {
-  const cookie: string = await localStorage.getItem(COOKIE_KEY);
+export function parseCookie(cookie: string) {
   let account = "";
   cookie.replace(/uin=(\d+)/g, (coo, acc) => {
     account = acc;
@@ -32,21 +31,18 @@ export default function Account() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    (async () => {
-      const id =
-        (await localStorage.getItem(ACCOUNT_KEY)) ||
-        (await getAccountFromCookie());
-      if (!id) {
-        setUserInfo({});
-        setUserCreateSongList([]);
-        setUserCollectSongList([]);
-      } else {
-        getAccountInfo(id);
-      }
-    })();
-  }, [visible]);
+    getAccountInfo();
+  }, []);
 
-  async function getAccountInfo(id: string) {
+  async function getAccountInfo() {
+    const cookie: string = await localStorage.getItem(COOKIE_KEY);
+    const id = parseCookie(cookie) || (await localStorage.getItem(ACCOUNT_KEY));
+    if (!id) {
+      setUserInfo({});
+      setUserCreateSongList([]);
+      setUserCollectSongList([]);
+      return;
+    }
     API.GetUserCreateSongList({ id }).then((res) => {
       const list = res.data.list;
       list.shift();
@@ -75,9 +71,23 @@ export default function Account() {
     } as any);
   }
 
+  function setAccount(acount: string) {
+    if (acount) {
+      getAccountInfo();
+    } else {
+      setUserInfo({});
+      setUserCreateSongList([]);
+      setUserCollectSongList([]);
+    }
+  }
+
   return (
     <View style={styles.container}>
-      <SetCookie visible={visible} setVisible={setVisible} />
+      <SetCookie
+        visible={visible}
+        setVisible={setVisible}
+        setAccount={setAccount}
+      />
       <View style={styles.topBox}>
         <Image
           style={styles.topBg}

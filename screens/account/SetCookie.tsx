@@ -4,8 +4,9 @@ import { StyleSheet, Text, View } from "react-native";
 import { ACCOUNT_KEY, COOKIE_KEY } from "../../constants/key";
 import { cache } from "../../utils/cookie";
 import { localStorage } from "../../utils/storage";
+import { parseCookie } from "./Account";
 
-export default function SetCookie({ visible, setVisible }: any) {
+export default function SetCookie({ visible, setVisible, setAccount }: any) {
   const [cookie, setCookie] = useState("");
   const [qq, setQQ] = useState("");
 
@@ -23,6 +24,7 @@ export default function SetCookie({ visible, setVisible }: any) {
     cache.parseCookie(cookie).forEach(([name, value]) => {
       cache.setCookie(name, value);
     });
+    setAccount(parseCookie(cookie));
     Toast.show({
       content: "Cookie设置成功！",
       position: "top",
@@ -32,6 +34,7 @@ export default function SetCookie({ visible, setVisible }: any) {
 
   function onGetAccountSongList() {
     localStorage.setItem(ACCOUNT_KEY, qq);
+    setAccount(qq);
     Toast.show({
       content: "账号设置成功！",
       position: "top",
@@ -45,6 +48,7 @@ export default function SetCookie({ visible, setVisible }: any) {
       content: "账号已移除！",
       position: "top",
     });
+    setAccount("");
     setQQ("");
     setVisible(false);
   }
