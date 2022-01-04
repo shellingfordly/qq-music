@@ -5,7 +5,7 @@ import { ACCOUNT_KEY, COOKIE_KEY } from "../../constants/key";
 import { cache } from "../../utils/cookie";
 import { localStorage } from "../../utils/storage";
 
-export default function SetCookie({ visible, setVisible, setAccount }: any) {
+export default function SetCookie({ visible, setVisible }: any) {
   const [cookie, setCookie] = useState("");
   const [qq, setQQ] = useState("");
 
@@ -32,7 +32,6 @@ export default function SetCookie({ visible, setVisible, setAccount }: any) {
 
   function onGetAccountSongList() {
     localStorage.setItem(ACCOUNT_KEY, qq);
-    setAccount(qq);
     Toast.show({
       content: "账号设置成功！",
       position: "top",
@@ -46,8 +45,8 @@ export default function SetCookie({ visible, setVisible, setAccount }: any) {
       content: "账号已移除！",
       position: "top",
     });
+    setQQ("");
     setVisible(false);
-    setAccount("");
   }
 
   return (

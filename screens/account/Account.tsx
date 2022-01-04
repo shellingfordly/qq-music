@@ -14,6 +14,16 @@ import SetCookie from "./SetCookie";
 import { localStorage } from "../../utils/storage";
 import { ACCOUNT_KEY, COOKIE_KEY } from "../../constants/key";
 
+async function getAccountFromCookie() {
+  const cookie: string = await localStorage.getItem(COOKIE_KEY);
+  let account = "";
+  cookie.replace(/uin=(\d+)/g, (coo, acc) => {
+    account = acc;
+    return coo;
+  });
+  return account;
+}
+
 export default function Account() {
   const [userInfo, setUserInfo] = useState<any>({});
   const [userCreateSongList, setUserCreateSongList] = useState<any[]>([]);
@@ -22,32 +32,30 @@ export default function Account() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    getAccountInfo();
+    (async () => {
+      const id =
+        (await localStorage.getItem(ACCOUNT_KEY)) ||
+        (await getAccountFromCookie());
+      if (!id) {
+        setUserInfo({});
+        setUserCreateSongList([]);
+        setUserCollectSongList([]);
+      } else {
+        getAccountInfo(id);
+      }
+    })();
   }, [visible]);
 
-  async function getAccountInfo() {
-    const account = await localStorage.getItem(ACCOUNT_KEY);
-    const cookie: string = await localStorage.getItem(COOKIE_KEY);
-    if (!account && !cookie) {
-      return;
-    }
-    let uin = "";
-    cookie.replace(/uin=(\d+)/g, (a, b) => {
-      uin = b;
-      return a;
-    });
-    const id = account || uin;
+  async function getAccountInfo(id: string) {
     API.GetUserCreateSongList({ id }).then((res) => {
       const list = res.data.list;
       list.shift();
       setUserInfo(res.data?.creator || {});
       setUserCreateSongList(list);
     });
-
     API.GetUserCollectSongList({ id }).then((res) => {
       setUserCollectSongList(res.data.list);
     });
-
     API.GetUserInfo({ id }).then((res) => {
       setUserInfo((oldInfo: any) => ({
         ...oldInfo,
@@ -67,33 +75,19 @@ export default function Account() {
     } as any);
   }
 
-  function onHeadPress() {
-    setVisible(true);
-  }
-
-  function setAccount(acount: string) {
-    if (acount) {
-      getAccountInfo();
-    } else {
-      setUserInfo({});
-      setUserCreateSongList([]);
-    }
-  }
-
   return (
     <View style={styles.container}>
-      <SetCookie
-        visible={visible}
-        setVisible={setVisible}
-        setAccount={setAccount}
-      />
+      <SetCookie visible={visible} setVisible={setVisible} />
       <View style={styles.topBox}>
         <Image
           style={styles.topBg}
           src={userInfo.bgUrl || require("../../assets/images/account-bg.jpg")}
         />
         <View style={styles.topContent}>
-          <TouchableOpacity style={styles.userHead} onPress={onHeadPress}>
+          <TouchableOpacity
+            style={styles.userHead}
+            onPress={() => setVisible(true)}
+          >
             {!userInfo.headUrl && <UserOutline fontSize={50} />}
             {userInfo.headUrl && (
               <Image
